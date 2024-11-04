@@ -21,6 +21,11 @@ if (!supabaseKey) {
   throw new Error('Supabase Key is undefined');
 }
 
+export const getImageUrl = (bucket: string, path: string | null) => {
+  if (!path) return null;
+  return `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
+};
+
 
 export const supabase = createClient(supabaseUrl!, supabaseKey, {
   auth: {

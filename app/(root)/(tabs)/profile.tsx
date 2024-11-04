@@ -1,22 +1,41 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuth } from "@/providers/AuthProvider";
+import RemoteImage from "@/components/RemoteImage";
+import { getImageUrl } from "@/lib/supabase";
 
 const Profile = () => {
+  const { profile } = useAuth();
+
   return (
     <SafeAreaView>
       {/* Profile Card */}
       <View className="bg-sunagorik m-4 p-4 rounded-xl shadow-sm">
-        <Text className="text-2xl font-bold mb-2 text-white">
-          Mahadi Sajjad
-        </Text>
-        <Text className="text-base text-gray-200 mb-3 leading-relaxed">
-          Passionate about creating extremely xenophobic and misogynistic jokes.
-        </Text>
-        <View className="flex-row items-center">
-          <Text className="text-sm text-gray-200">Housing Estate, Maizdee</Text>
+        <View className="flex-row items-center mb-4">
+          <View className="w-20 h-20 rounded-full border-2 border-gray-200 p-[2px]">
+            <Image
+              source={
+                getImageUrl("avatars", profile?.avatar_url)
+                  ? { uri: getImageUrl("avatars", profile?.avatar_url) }
+                  : require("@/assets/images/avatar.png")
+              }
+              className="w-full h-full rounded-full"
+            />
+          </View>
+          <View className="ml-4 flex-1">
+            <Text className="text-2xl font-bold text-white">
+              {profile?.username}
+            </Text>
+            <Text className="text-sm text-gray-200">
+              {profile?.neighborhood}
+            </Text>
+          </View>
         </View>
+        <Text className="text-base text-gray-200 mb-3 leading-relaxed">
+          {profile?.about}
+        </Text>
       </View>
 
       {/* First Row Stats */}
@@ -66,7 +85,7 @@ const Profile = () => {
             </View>
             <View className="ml-2">
               <Text className="text-4xl font-bold text-sunagorik">15</Text>
-              <Text className="text-sm text-gray-600">Top Reports</Text>
+              <Text className="text-sm text-gray-600">Pending</Text>
             </View>
           </View>
         </View>
@@ -80,7 +99,9 @@ const Profile = () => {
               />
             </View>
             <View className="ml-2">
-              <Text className="text-4xl font-bold text-sunagorik">92</Text>
+              <Text className="text-4xl font-bold text-sunagorik">
+                {profile?.citizen_score}
+              </Text>
               <Text className="text-sm text-gray-600">Citizen Score</Text>
             </View>
           </View>
@@ -90,55 +111,65 @@ const Profile = () => {
       {/* Achievements Card */}
       <View className="mt-4 px-4">
         <View className="bg-white p-4 rounded-xl shadow-sm">
-          <Text className="text-lg font-semibold text-gray-800 mb-4">Achievements</Text>
-          
+          <Text className="text-lg font-semibold text-gray-800 mb-4">
+            Achievements
+          </Text>
+
           <View className="flex-row flex-wrap justify-between">
             {/* First Time Reporter Badge */}
             <View className="items-center mb-4 w-[22%]">
               <View className="bg-gray-50 p-3 rounded-full">
-                <MaterialCommunityIcons 
-                  name="medal-outline" 
-                  size={32} 
+                <MaterialCommunityIcons
+                  name="medal-outline"
+                  size={32}
                   color="#CF322C"
                 />
               </View>
-              <Text className="text-xs text-gray-600 mt-2 text-center">First Time{'\n'}Reporter</Text>
+              <Text className="text-xs text-gray-600 mt-2 text-center">
+                First Time{"\n"}Reporter
+              </Text>
             </View>
 
             {/* Problem Solver Badge */}
             <View className="items-center mb-4 w-[22%]">
               <View className="bg-gray-50 p-3 rounded-full">
-                <MaterialCommunityIcons 
-                  name="lightbulb-outline" 
-                  size={32} 
+                <MaterialCommunityIcons
+                  name="lightbulb-outline"
+                  size={32}
                   color="#CF322C"
                 />
               </View>
-              <Text className="text-xs text-gray-600 mt-2 text-center">Problem{'\n'}Solver</Text>
+              <Text className="text-xs text-gray-600 mt-2 text-center">
+                Problem{"\n"}Solver
+              </Text>
             </View>
 
             {/* Top Contributor Badge */}
             <View className="items-center mb-4 w-[22%]">
               <View className="bg-gray-50 p-3 rounded-full">
-                <MaterialCommunityIcons 
-                  name="trophy-outline" 
-                  size={32} 
+                <MaterialCommunityIcons
+                  name="trophy-outline"
+                  size={32}
                   color="#CF322C"
                 />
               </View>
-              <Text className="text-xs text-gray-600 mt-2 text-center">Top{'\n'}Contributor</Text>
+              <Text className="text-xs text-gray-600 mt-2 text-center">
+                Top{"\n"}Contributor
+              </Text>
             </View>
 
             {/* Community Hero Badge */}
             <View className="items-center mb-4 w-[22%]">
               <View className="bg-gray-50 p-3 rounded-full">
-                <MaterialCommunityIcons 
-                  name="heart-outline" 
-                  size={32} 
+                <MaterialCommunityIcons
+                  name="heart-outline"
+                  size={32}
                   color="#CF322C"
                 />
               </View>
-              <Text className="text-xs text-gray-600 mt-2 text-center">Community{'\n'}Hero</Text>
+              <Text className="text-xs text-gray-600 mt-2 text-center">
+                Community{"\n"}Hero
+              </Text>
             </View>
           </View>
         </View>

@@ -36,12 +36,19 @@ export default function AuthProvider({ children }: PropsWithChildren) {
       setSession(session);
 
       if (session) {
-        const { data } = await supabase
+        const { data: profile } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", session.user.id)
           .single();
-        setProfile(data || null);
+        setProfile(profile || null);
+      }
+
+      if (profile?.avatar_url) {
+        const { data } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(profile.avatar_url);
+        profile.avatar_url = data.publicUrl;
       }
 
       setLoading(false)
@@ -52,6 +59,8 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         setSession(session);
     });
   }, []);
+
+  console.log(session);
 
 
   return (

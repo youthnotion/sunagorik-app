@@ -7,7 +7,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
+  Alert,
   Dimensions,
   Image,
   Modal,
@@ -17,6 +17,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 const ReportDetailScreen = () => {
   const { id } = useLocalSearchParams();
   const [isRateModalVisible, setRateModalVisible] = useState(false);
@@ -49,35 +51,32 @@ const ReportDetailScreen = () => {
 
   const handleFalseReport = () => {
     Alert.alert(
-        "Confirm", 
-        "Are you sure you want to report this as false?", 
-        [
-          { 
-            text: "Cancel",
-            style: "cancel",
-          },
-          {
-            text: "Report",
-            style: "destructive",
-            onPress: () => console.log("Reported"),
-          },
-        ],
+      "Confirm",
+      "Are you sure you want to report this as false?",
+      [
         {
-          cancelable: true,
-        }
-      );
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Report",
+          style: "destructive",
+          onPress: () => console.log("Reported"),
+        },
+      ],
+      {
+        cancelable: true,
+      }
+    );
   };
-
 
   return (
     <>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        className="flex-1 bg-white"
+        className="flex-1 "
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        
-
         <Image
           source={{ uri: report.image }}
           className="w-full h-[300px]"
@@ -87,7 +86,29 @@ const ReportDetailScreen = () => {
         <View className="p-4">
           <Text className="text-2xl font-JakartaBold mb-4">{report.title}</Text>
 
-          <View className="flex flex-row items-center gap-x-2 mb-4">
+          <View className="mb-4 flex-row items-center">
+            <View className="w-12 h-12 rounded-full border-2 border-sunagorik p-[2px]">
+            <Image
+              source={{
+                uri: "https://flmuyyvdnvexbgkqehth.supabase.co/storage/v1/object/public/avatars/a65c1a16-deb7-45a2-a6bd-27fd9b1caeb3/avatar.jpg",
+              }}
+              className="w-full h-full rounded-full "
+            />
+            </View>
+            <View className="ml-3">
+              <Text className="text-sm font-JakartaMedium">
+                {report.reporter.first_name} {report.reporter.last_name}
+              </Text>
+              <View className="flex-row items-center">
+                <FontAwesome name="star" size={14} color="#CF322C" />
+                <Text className="text-sm font-JakartaMedium ml-1">
+                  {report.reporter.rating}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <View className="flex flex-row items-center gap-x-2 mb-2">
             <Octicons name="location" size={20} color="#CF322C" />
             <Text className="text-md font-JakartaMedium">{report.address}</Text>
           </View>
@@ -134,46 +155,42 @@ const ReportDetailScreen = () => {
             </View>
           </View>
 
-          <View className="bg-general-500 rounded-lg p-4">
-            <View className="flex flex-row justify-between mb-2">
-              <Text className="text-md font-JakartaMedium text-gray-500">
-                Reported At
-              </Text>
-              <Text className="text-md font-JakartaMedium text-gray-500">
-                {formatDate(report.created_at)}
-              </Text>
-            </View>
-
-            <View className="flex flex-row justify-between mb-2">
-              <Text className="text-md font-JakartaMedium text-gray-500">
-                Posted By
-              </Text>
-              <Text className="text-md font-JakartaMedium text-gray-500">
-                {report.reporter.first_name} {report.reporter.last_name}
-              </Text>
-            </View>
-
-            <View className="flex flex-row justify-between mb-2">
-              <Text className="text-md font-JakartaMedium text-gray-500">
-                Category
-              </Text>
-              <Text className="text-md font-JakartaMedium text-gray-500">
+          <View className="bg-white rounded-lg p-3 flex-row justify-between">
+            {/* Category */}
+            <View className="items-center flex-1">
+              <MaterialCommunityIcons
+                name="shape-outline"
+                size={32}
+                color="#cf322c"
+              />
+              <Text className="text-sm font-JakartaMedium text-gray-500 mt-1">
                 {report.category}
               </Text>
             </View>
 
-            <View className="flex flex-row justify-between">
-              <Text className="text-md font-JakartaMedium text-gray-500">
-                Report Status
-              </Text>
+            {/* Status */}
+            <View className="items-center flex-1">
+              <MaterialCommunityIcons
+                name="progress-check"
+                size={32}
+                color="#cf322c"
+              />
               <Text
-                className={`text-md capitalize font-JakartaMedium ${
-                  report.report_status === "resolved"
-                    ? "text-green-500"
-                    : "text-sunagorik"
-                }`}
+                className={`text-sm capitalize font-JakartaMedium mt-1 text-gray-500`}
               >
                 {report.report_status}
+              </Text>
+            </View>
+
+            {/* Reported At */}
+            <View className="items-center flex-1">
+              <MaterialCommunityIcons
+                name="clock-outline"
+                size={32}
+                color="#cf322c"
+              />
+              <Text className="text-sm font-JakartaMedium text-gray-500 text-center mt-1">
+                August 12, {"\n"} 2024
               </Text>
             </View>
           </View>
@@ -200,11 +217,7 @@ const ReportDetailScreen = () => {
           <Text className="text-xl font-JakartaBold mb-8">Rate Severity</Text>
 
           <View className="items-center mb-8">
-            <StarRating
-              rating={rating}
-              onRatingChange={setRating}
-              size={40}
-            />
+            <StarRating rating={rating} onRatingChange={setRating} size={40} />
           </View>
 
           <View className="flex-row w-full pb-4">
