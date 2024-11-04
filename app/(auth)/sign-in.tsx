@@ -3,10 +3,11 @@ import ErrorMessage from "@/components/ErrorMessage";
 import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
-import { Link } from "expo-router";
+import { supabase } from "@/lib/supabase";
+import { Link, router } from "expo-router";
 import { Formik } from "formik";
 import React, { useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Alert, Image, ScrollView, Text, View } from "react-native";
 import * as Yup from "yup";
 
 const validationSchema = Yup.object().shape({
@@ -21,9 +22,37 @@ const validationSchema = Yup.object().shape({
 });
 
 const SignIn = () => {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const onSignInPress = async (values: { email: string; password: string }) => {
+    const { data: authData, error: authError } =
+      await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
 
-  const onSignInPress = () => {};
+    if (authError) {
+      Alert.alert(authError.message);
+      console.log(authError.message);
+    }
+
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select()
+      .eq("id", authData.user?.id)
+      .single();
+
+    if (profileError) {
+      Alert.alert(profileError.message);
+    }
+
+    else if (profileData.username === null) {
+      console.log(profileError);
+      router.replace("/(form)/(profile)/body");
+    } else {
+      console.log(profileData);
+      router.replace("/(tabs)/home");
+    }
+
+  };
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -63,8 +92,8 @@ const SignIn = () => {
                   keyboardType="email-address"
                   icon={icons.email}
                   value={values.email}
-                  onChangeText={handleChange('email')}
-                  onBlur={() => setFieldTouched('email')}
+                  onChangeText={handleChange("email")}
+                  onBlur={() => setFieldTouched("email")}
                 />
                 <ErrorMessage error={errors.email} visible={touched.email} />
 
@@ -74,13 +103,16 @@ const SignIn = () => {
                   icon={icons.lock}
                   secureTextEntry={true}
                   value={values.password}
-                  onChangeText={handleChange('password')}
-                  onBlur={() => setFieldTouched('password')}
+                  onChangeText={handleChange("password")}
+                  onBlur={() => setFieldTouched("password")}
                 />
-                <ErrorMessage error={errors.password} visible={touched.password} />
+                <ErrorMessage
+                  error={errors.password}
+                  visible={touched.password}
+                />
                 <CustomButton
                   title="Sign In"
-                  onPress={onSignInPress}
+                  onPress={handleSubmit}
                   className="mt-6"
                 />
               </>

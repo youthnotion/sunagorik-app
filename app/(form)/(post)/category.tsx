@@ -1,5 +1,5 @@
 import { View, Image, TouchableOpacity, Text, ScrollView } from "react-native";
-import { useFormContext } from "../../providers/FormProvider";
+import { useFormContext } from "../../../providers/PostFormProvider";
 import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
 import { icons } from "@/constants";

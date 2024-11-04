@@ -1,24 +1,14 @@
+import AuthProvider from "@/providers/AuthProvider";
 import { Stack } from "expo-router";
-import { FormProvider } from "../../providers/FormProvider";
 
 const Layout = () => {
   return (
-    <FormProvider>
+    <AuthProvider>
       <Stack>
-        <Stack.Screen
-          name="category"
-          options={{ title: "Category", headerShown: true }}
-        />
-        <Stack.Screen
-          name="body"
-          options={{ title: "Your Report", headerShown: true }}
-        />
-        <Stack.Screen
-          name="image"
-          options={{ title: "Upload Image", headerShown: true }}
-        />
+        <Stack.Screen name="(post)" options={{ headerShown: false }} />
+        <Stack.Screen name="(profile)" options={{ headerShown: false }} />
       </Stack>
-    </FormProvider>
+    </AuthProvider>
   );
 };
 

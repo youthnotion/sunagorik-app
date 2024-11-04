@@ -3,7 +3,7 @@ import ErrorMessage from "@/components/ErrorMessage";
 import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Formik } from "formik";
 import React from "react";
 import { Alert, Image, ScrollView, Text, View } from "react-native";
@@ -28,8 +28,10 @@ const SignUp = () => {
       Alert.alert('Error', error.message);
     }
 
-    if (data) {
-      Alert.alert('Success', 'Account created successfully');
+    else if (data) {
+      Alert.alert('Success', 'Account created successfully', [{ text: 'OK', onPress: () => {
+        router.replace('/(auth)/sign-in');
+      } }]);
     }
 
   };
