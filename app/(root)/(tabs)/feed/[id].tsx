@@ -1,6 +1,12 @@
+import { useCreateFalseReport, useFalseReports } from "@/api/false_report";
+import { usePost } from "@/api/post";
+import { useCreateSeverityRating, useSeverityRatings } from "@/api/severity_ratings";
 import CustomButton from "@/components/CustomButton";
 import StarRating from "@/components/StarRating";
+import { getImageUrl } from "@/lib/supabase";
 import { formatDate } from "@/lib/utils";
+import { useAuth } from "@/providers/AuthProvider";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
@@ -8,46 +14,28 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
-  Dimensions,
   Image,
   Modal,
-  Pressable,
   ScrollView,
   Text,
-  TouchableOpacity,
-  View,
+  View
 } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const ReportDetailScreen = () => {
   const { id } = useLocalSearchParams();
+  const { profile } = useAuth();
   const [isRateModalVisible, setRateModalVisible] = useState(false);
   const [rating, setRating] = useState(0);
-  const report = {
-    report_id: "3",
-    title: "Drainage problem",
-    address: "Mosjid Market, Maizdee",
-    latitude: "45.815011",
-    longitude: "15.981919",
-    severity: 1,
-    vote_number: 8,
-    category: "Drainage Problem",
-    report_status: "in progress",
-    created_at: "2024-08-12 08:49:01.809053",
-    reporter: {
-      reporter_id: "1",
-      first_name: "Mumtahin",
-      last_name: "Sifat",
 
-      rating: "4.80",
-    },
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Maijdee%2CNoakhal.jpg/4000px-Mapcarta.jpg",
-    description:
-      "In our community, a serious drainage issue has been causing water to overflow, disrupting daily activities and posing significant risks to residents' safety and health. The overflowing water not only creates unsanitary conditions but also makes roads difficult to navigate, affecting both pedestrians and drivers. The situation is especially concerning during rainfall, which further worsens the problem and leaves many frustrated and unable to go about their daily routines. We urge the local authorities to take immediate action to address this drainage problem. A timely response is essential to prevent further inconvenience and safeguard the community from potential hazards. Repairing the drainage system will not only restore normalcy but also improve the area’s hygiene and accessibility, making it safer and more comfortable for everyone. Let’s work together to resolve this issue for the well-being of our neighborhood!",
-  };
-
+  const { data: report, isLoading, error } = usePost(Number(id));
+  const { mutate: createSeverityRating } = useCreateSeverityRating();
+  const { mutate: createFalseReport } = useCreateFalseReport();
+  const { data: falseReports, refetch: refetchFalseReports } = useFalseReports(profile?.id, Number(id));
+  const { data: severityRating, refetch: refetchSeverityRating } = useSeverityRatings(Number(id), profile?.id);
   if (!report) return null;
+
+  const hasUserReported = (falseReports?.length ?? 0) > 0;
+  const userRating = severityRating?.rating ? severityRating?.rating : 0;
 
   const handleFalseReport = () => {
     Alert.alert(
@@ -61,7 +49,15 @@ const ReportDetailScreen = () => {
         {
           text: "Report",
           style: "destructive",
-          onPress: () => console.log("Reported"),
+          onPress: () => createFalseReport({ post_id: Number(id), user_id: profile?.id }, {
+            onSuccess: () => {
+              Alert.alert("Success", "Your report has been submitted successfully!");
+              refetchFalseReports();
+            },
+            onError: (error) => {
+              Alert.alert("Error", "Failed to submit report. Please try again later.");
+            }
+          }),
         },
       ],
       {
@@ -78,7 +74,7 @@ const ReportDetailScreen = () => {
         contentContainerStyle={{ paddingBottom: 100 }}
       >
         <Image
-          source={{ uri: report.image }}
+          source={{ uri: getImageUrl("posts", report.image) || undefined }}
           className="w-full h-[300px]"
           resizeMode="contain"
         />
@@ -92,12 +88,12 @@ const ReportDetailScreen = () => {
               source={{
                 uri: "https://flmuyyvdnvexbgkqehth.supabase.co/storage/v1/object/public/avatars/a65c1a16-deb7-45a2-a6bd-27fd9b1caeb3/avatar.jpg",
               }}
-              className="w-full h-full rounded-full "
+              className="w-full h-full rounded-full"
             />
             </View>
             <View className="ml-3">
               <Text className="text-sm font-JakartaMedium">
-                {report.reporter.first_name} {report.reporter.last_name}
+                {report.reporter.full_name}
               </Text>
               <View className="flex-row items-center">
                 <FontAwesome name="star" size={14} color="#CF322C" />
@@ -110,21 +106,21 @@ const ReportDetailScreen = () => {
 
           <View className="flex flex-row items-center gap-x-2 mb-2">
             <Octicons name="location" size={20} color="#CF322C" />
-            <Text className="text-md font-JakartaMedium">{report.address}</Text>
+            <Text className="text-md font-JakartaMedium">{report.neighborhood}</Text>
           </View>
 
           <View className="flex flex-row items-center justify-between mb-6">
             <View className="flex flex-row items-center gap-x-2">
               <FontAwesome name="star" size={20} color="#CF322C" />
               <Text className="text-md font-JakartaMedium">
-                Severity: {report.severity}
+                Severity: {report.severity_score}
               </Text>
             </View>
 
             <View className="flex flex-row items-center gap-x-2">
               <Octicons name="people" size={20} color="#CF322C" />
               <Text className="text-md font-JakartaMedium">
-                Votes: {report.vote_number}
+                Votes: {report.votes}
               </Text>
             </View>
           </View>
@@ -132,8 +128,10 @@ const ReportDetailScreen = () => {
           <View className="flex-row w-full pb-4">
             <View className="flex-1 mr-2">
               <CustomButton
-                title="  Rate Severity"
+                title={userRating > 0 ? `  ${userRating} Rated ` : "  Rate Severity"}
                 onPress={() => setRateModalVisible(true)}
+                disabled={userRating > 0}
+                bgVariant={userRating > 0 ? "secondary" : "primary"}
                 IconLeft={() => (
                   <FontAwesome name="star" size={24} color="white" />
                 )}
@@ -141,8 +139,10 @@ const ReportDetailScreen = () => {
             </View>
             <View className="flex-1 ml-2">
               <CustomButton
-                title="  False Report"
+                title={hasUserReported ? "  Reported" : "  False Report"}
                 onPress={handleFalseReport}
+                disabled={hasUserReported}
+                bgVariant={hasUserReported ? "secondary" : "primary"}
                 IconLeft={() => (
                   <MaterialIcons
                     name="report"
@@ -163,7 +163,7 @@ const ReportDetailScreen = () => {
                 size={32}
                 color="#cf322c"
               />
-              <Text className="text-sm font-JakartaMedium text-gray-500 mt-1">
+              <Text className="text-sm font-JakartaMedium text-gray-500 text-center mt-1">
                 {report.category}
               </Text>
             </View>
@@ -178,7 +178,7 @@ const ReportDetailScreen = () => {
               <Text
                 className={`text-sm capitalize font-JakartaMedium mt-1 text-gray-500`}
               >
-                {report.report_status}
+                {report.status}
               </Text>
             </View>
 
@@ -190,7 +190,7 @@ const ReportDetailScreen = () => {
                 color="#cf322c"
               />
               <Text className="text-sm font-JakartaMedium text-gray-500 text-center mt-1">
-                August 12, {"\n"} 2024
+                {formatDate(report.created_at)}
               </Text>
             </View>
           </View>
@@ -224,7 +224,29 @@ const ReportDetailScreen = () => {
             <View className="flex-1 mr-2">
               <CustomButton
                 title="Submit"
-                onPress={() => setRateModalVisible(false)}
+                onPress={() => {
+                  createSeverityRating({ 
+                    post_id: Number(id), 
+                    user_id: profile?.id, 
+                    rating 
+                  }, {
+                    onSuccess: () => {
+                      Alert.alert(
+                        "Success",
+                        "Your severity rating has been submitted successfully!"
+                      );
+                      setRateModalVisible(false);
+                      refetchSeverityRating();
+                    },
+                    onError: (error) => {
+                      Alert.alert(
+                        "Error",
+                        "Failed to submit rating. Please try again."
+                      );
+                      setRateModalVisible(false);
+                    }
+                  });
+                }}
               />
             </View>
             <View className="flex-1 ml-2">

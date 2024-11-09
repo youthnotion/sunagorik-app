@@ -44,13 +44,6 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         setProfile(profile || null);
       }
 
-      if (profile?.avatar_url) {
-        const { data } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(profile.avatar_url);
-        profile.avatar_url = data.publicUrl;
-      }
-
       setLoading(false)
     };
     

@@ -1,19 +1,18 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
-import { useFormContext } from "../../../providers/ProfileFormProvider";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
-import * as Location from "expo-location";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import * as FileSystem from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Image, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useFormContext } from "../../../providers/ProfileFormProvider";
 
-import { Alert } from "react-native";
-import { supabase } from "@/lib/supabase";
-import { decode } from "base64-arraybuffer";
 import { useUpdateProfile } from "@/api/profile";
+import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/providers/AuthProvider";
+import { decode } from "base64-arraybuffer";
+import { Alert } from "react-native";
 
 export default function ImageUpload() {
   const { formData, updateProfileData } = useFormContext();

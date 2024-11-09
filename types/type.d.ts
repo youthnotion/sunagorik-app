@@ -33,24 +33,29 @@ declare interface MapProps {
     onMapReady?: () => void;
 }
 
-declare interface Ride {
+declare interface Report {
+    id: number;
     title: string;
     category: string;
-    address: string;
-    latitude: number;
+    description: string;
+    location: string;
+    neighborhood: number;
     longitude: number;
-    severity: number;
-    vote_number: number;
-    report_status: string;
-    reporter_id: number;
-    user_email: string;
+    status: string;
+    severity_score: number;
+    votes: number;
     created_at: string;
     reporter: {
-        first_name: string;
-        last_name: string;
-        car_seats: number;
+        id: number;
+        full_name: string;
+        avatar_url: string;
+        rating: number;
     };
     image: string;
+}
+
+declare interface SeverityRating {
+    rating: number;
 }
 
 declare interface ButtonProps extends TouchableOpacityProps {

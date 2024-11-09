@@ -1,123 +1,179 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { useFormContext } from "../../../providers/PostFormProvider";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { Alert } from "react-native";
+import { decode } from "base64-arraybuffer";
+import { supabase } from "@/lib/supabase";
+import * as FileSystem from "expo-file-system";
+import { randomUUID } from "expo-crypto";
+import { useCreatePost } from "@/api/post";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function ImageUpload() {
+  const { profile } = useAuth();
   const { formData, updateFormData } = useFormContext();
   const router = useRouter();
-  const [image, setImage] = useState<string | null>(formData.image || null);
+  const [image, setImage] = useState<string | null>(null);
+  const [location, setLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const { mutate: createPost } = useCreatePost();
 
-  const pickImage = async () => {
+  useEffect(() => {
+    const requestLocation = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permission denied", "Location permission is required");
+          return;
+        }
+
+        const position = await Location.getCurrentPositionAsync({});
+        const newLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        };
+
+        // First update local state
+        setLocation(newLocation);
+
+        // Then explicitly update form data
+        updateFormData({ location: newLocation });
+      } catch (error) {
+        console.error("Error getting location:", error);
+      }
+    };
+
+    requestLocation();
+  }, []);
+
+  const getImageTypeFromBase64 = (base64String: string) => {
+    // Check the base64 header to determine file type
+    if (base64String.startsWith("/9j/")) return "jpg";
+    if (base64String.startsWith("iVBORw0KGgo")) return "png";
+    return "jpg"; // default fallback
+  };
+
+  const uploadImage = async () => {
     try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: false,
-        quality: 1,
+      const base64Image = await FileSystem.readAsStringAsync(image, {
+        encoding: "base64",
       });
 
-      if (!result.canceled) {
-        setImage(result.assets[0].uri);
-      }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user");
+
+      const imageType = getImageTypeFromBase64(base64Image);
+      const filePath = `${randomUUID()}.${imageType}`;
+      const contentType = `image/${imageType}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("posts")
+        .upload(filePath, decode(base64Image), {
+          contentType,
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+      else return uploadData.path;
     } catch (error) {
-      console.log("Error picking image:", error);
+      console.error("Error uploading image:", error);
+      alert("Error uploading image!");
+    }
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
     }
   };
 
   const takePhoto = async () => {
-    try {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== "granted") {
-        alert("Sorry, we need camera permissions to make this work!");
-        return;
-      }
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera permissions to make this work!");
+      return;
+    }
 
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: false,
-        quality: 1,
-      });
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: false,
+      quality: 0.5,
+    });
 
-      if (!result.canceled) {
-        setImage(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.log("Error taking photo:", error);
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
     }
   };
 
   const handleSubmission = async () => {
     if (image) {
       try {
-        // Request location permission
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert(
-            "Permission Denied",
-            "Please allow location access to submit the report."
-          );
-          return;
+        console.log("Starting upload...");
+        const imagePath = await uploadImage();
+
+        if (!imagePath) {
+          throw new Error("No avatar path returned from upload");
         }
 
-        // Get current location
-        const location = await Location.getCurrentPositionAsync({});
-        const { latitude, longitude } = location.coords;
+        console.log("Image uploaded, path:", imagePath);
 
-        // Update form with image and location
-        updateFormData({
-          image,
-          location: { latitude, longitude },
-        });
+        const createData = {
+          title: formData.title,
+          category: formData.category,
+          description: formData.description,
+          image: imagePath,
+          location: location,
+          severity_score: formData.severity,
+          reported_by: profile?.id,
+        };
 
-        // Submit the complete form
-        try {
-          // Show loading alert
-          //   Alert.alert(
-          //     'Submitting Report',
-          //     'Please wait while we submit your report...'
-          //   );
+        console.log("Creating post with:", createData);
 
-          // const response = await submitFormToBackend(formData);
-
-          // Show success message
-          Alert.alert(
-            "Success!",
-            "Your report has been submitted successfully.",
-            [
-              {
-                text: "OK",
-                onPress: () => {
-                  // Reset form data
-                  updateFormData({});
-                  // Navigate back to home
-                  router.replace("/(tabs)/home");
+        await createPost(createData, {
+          onSuccess: (data) => {
+            console.log("Post created successfully:", data);
+            Alert.alert(
+              "Success!",
+              "Your report has been submitted successfully.",
+              [
+                {
+                  text: "OK",
+                  onPress: () => {
+                    updateFormData({});
+                    router.replace("/(tabs)/home");
+                  },
                 },
-              },
-            ]
-          );
-
-          console.log(formData);
-        } catch (error) {
-          Alert.alert("Error", "Failed to submit report. Please try again.", [
-            {
-              text: "OK",
-              style: "cancel",
-            },
-          ]);
-          console.error("Submission error:", error);
-        }
-      } catch (error) {
-        Alert.alert("Error", "Failed to get location. Please try again.", [
-          {
-            text: "OK",
-            style: "cancel",
+              ]
+            );
           },
+          onError: (error) => {
+            console.error("Post creation failed:", error);
+            Alert.alert(
+              "Error",
+              "Failed to submit report. Please try again.",
+              [{ text: "OK" }]
+            );
+          },
+        });
+      } catch (error) {
+        console.error("Submission error:", error);
+        Alert.alert("Error", "Failed to submit report. Please try again.", [
+          { text: "OK" },
         ]);
-        console.error("Location error:", error);
       }
     }
   };

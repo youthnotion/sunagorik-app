@@ -4,7 +4,7 @@ interface FormData {
   category: string;
   title: string;
   description: string;
-  image: any;
+  image: string | null;
   location: {
     latitude: number;
     longitude: number;
@@ -26,7 +26,10 @@ export function FormProvider({ children }: { children: ReactNode }) {
     title: '',
     description: '',
     image: null,
-    location: { latitude: 0, longitude: 0 },
+    location: {
+      latitude: 0,
+      longitude: 0,
+    },
     severity: 0,
   });
 
@@ -40,7 +43,10 @@ export function FormProvider({ children }: { children: ReactNode }) {
       title: '',
       description: '',
       image: null,
-      location: { latitude: 0, longitude: 0 },
+      location: {
+        latitude: 0,
+        longitude: 0,
+      },
       severity: 0,
     });
   };

@@ -35,8 +35,6 @@ const Home = () => {
         longitude: location.coords?.longitude!,
       });
 
-      console.log(address);
-
       setUserLocation({
         // latitude: location.coords.latitude,
         // longitude: location.coords.longitude,

@@ -1,25 +1,25 @@
+import { getImageUrl } from "@/lib/supabase";
 import { formatDate } from "@/lib/utils";
-import { Ride } from "@/types/type";
+import { Report } from "@/types/type";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Octicons from "@expo/vector-icons/Octicons";
 import { Link } from "expo-router";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 const RideCard = ({
-  ride: {
+  post: {
     id,
     title,
-    address,
+    neighborhood,
     created_at,
-    reporter,
-    report_status,
+    status,
     category,
-    severity,
-    vote_number,
+    severity_score,
     image,
+    reporter,
   },
 }: {
-  ride: Ride;
+  post: Report;
 }) => (
   <Link href={`/feed/${id}`} asChild>
     <Pressable className="flex flex-row items-center justify-center bg-white rounded-lg shadow-sm shadow-neutral-300 mb-3">
@@ -34,31 +34,23 @@ const RideCard = ({
 
             <View className="w-full mx-0 rounded-md overflow-hidden">
               <Image
-                source={{ uri: image }}
+                source={{ uri: getImageUrl("posts", image) || undefined }}
                 resizeMode="cover"
                 className="w-full h-[200px] "
               />
             </View>
 
-            <View className="flex flex-row items-center gap-x-2">
-              <Octicons name="location" size={20} color="#CF322C" />
-              <Text className="text-md font-JakartaMedium" numberOfLines={1}>
-                {address}
-              </Text>
-            </View>
-
             <View className="flex flex-row items-center justify-between">
+              <View className="flex flex-row items-center gap-x-2">
+                <Octicons name="location" size={20} color="#CF322C" />
+                <Text className="text-md font-JakartaMedium" numberOfLines={1}>
+                  {neighborhood}
+                </Text>
+              </View>
               <View className="flex flex-row items-center gap-x-2">
                 <FontAwesome name="star" size={20} color="#CF322C" />
                 <Text className="text-md font-JakartaMedium" numberOfLines={1}>
-                  {severity}
-                </Text>
-              </View>
-
-              <View className="flex flex-row items-center gap-x-2">
-                <Octicons name="people" size={20} color="#CF322C" />
-                <Text className="text-md font-JakartaMedium" numberOfLines={1}>
-                  {vote_number}
+                  {severity_score}
                 </Text>
               </View>
             </View>
@@ -80,7 +72,7 @@ const RideCard = ({
               Posted By
             </Text>
             <Text className="text-md font-JakartaMedium text-gray-500">
-              {reporter.first_name} {reporter.last_name}
+              {reporter.full_name}
             </Text>
           </View>
 
@@ -99,12 +91,10 @@ const RideCard = ({
             </Text>
             <Text
               className={`text-md capitalize font-JakartaMedium text-gray-500 ${
-                report_status === "resolved"
-                  ? "text-green-500"
-                  : "text-sunagorik"
+                status === "resolved" ? "text-green-500" : "text-sunagorik"
               }`}
             >
-              {report_status}
+              {status}
             </Text>
           </View>
         </View>
