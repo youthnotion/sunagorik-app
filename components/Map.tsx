@@ -2,15 +2,14 @@ import { icons } from "@/constants";
 import { mapStyle } from "@/constants/mapStyle";
 import { calculateRegion } from "@/lib/map";
 import { useLocationStore } from "@/store";
-import React, { useState, useCallback, useRef } from "react";
-import { Image, Text, View, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import * as Location from 'expo-location';
+import React, { useCallback, useRef, useState } from "react";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import MapView, {
   Marker,
-  PROVIDER_DEFAULT,
-  PROVIDER_GOOGLE,
+  PROVIDER_GOOGLE
 } from "react-native-maps";
-import * as Location from 'expo-location';
-import { Ionicons } from "@expo/vector-icons";
 
 function generateRandomMarkers(baseMarkers: any[], count: number) {
   const markers = [...baseMarkers]; // Keep original markers

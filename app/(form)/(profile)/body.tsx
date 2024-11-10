@@ -1,10 +1,8 @@
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
-import { useFormContext } from "../../../providers/ProfileFormProvider";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import StarRating from "@/components/StarRating";
-import ActivityIndicator from "@/components/ActivityIndicator";
+import { useFormContext } from "../../../providers/ProfileFormProvider";
 
 export default function FormBody() {
   const { formData, updateProfileData } = useFormContext();

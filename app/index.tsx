@@ -1,7 +1,7 @@
 import { Redirect } from "expo-router";
 import React from "react";
 import { useAuth } from "@/providers/AuthProvider";
-import { ActivityIndicator } from "react-native";
+import ActivityIndicator from "@/components/ActivityIndicator";
 import { View } from "react-native";
 
 const Home = () => {
@@ -10,7 +10,7 @@ const Home = () => {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" />
+        <ActivityIndicator visible={true} />
       </View>
     );
   }

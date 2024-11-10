@@ -7,12 +7,12 @@ import {
   View,
   StyleSheet,
   Text,
-  ActivityIndicator,
   FlatList,
   Image,
   Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ActivityIndicator from "@/components/ActivityIndicator";
 
 
 const Feed = () => {
@@ -38,10 +38,13 @@ const Feed = () => {
   };
 
   const { data: posts, error, isLoading } = userPostList(getFilterParams());
-  console.log(posts);
+
+  if (isLoading) {
+    return <ActivityIndicator visible={true} />;
+  }
 
   return (
-    <SafeAreaView style={styles.container} className="px-2">
+    <SafeAreaView className="px-2">
       <View className="flex flex-row justify-between">
         {["My Posts", "Initiated", "In Progress", "Resolved", "Severe"].map(
           (status) => (
@@ -78,28 +81,22 @@ const Feed = () => {
         contentContainerStyle={{ paddingBottom: 160 }}
         ListEmptyComponent={() => (
           <View className="flex flex-col items-center justify-center">
-            {!isLoading ? (
               <>
                 <Image
                   source={images.noResult}
                   className="w-40 h-40"
                   alt="We can't find any posts right now!"
                   resizeMode="contain"
-                />
-                <Text className="text-sm">We can't find any posts right now!</Text>
-              </>
-            ) : (
-              <ActivityIndicator size="small" color="#000" />
-            )}
+              />
+              <Text className="text-sm">
+                We can't find any posts right now!
+              </Text>
+            </>
           </View>
         )}
       />
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {},
-});
 
 export default Feed;

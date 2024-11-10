@@ -11,6 +11,7 @@ const Profile = () => {
 
   return (
     <SafeAreaView>
+
       {/* Profile Card */}
       <View className="bg-sunagorik m-4 p-4 rounded-xl shadow-sm">
         <View className="flex-row items-center mb-4">

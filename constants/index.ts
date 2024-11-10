@@ -45,7 +45,8 @@ import toilet from "@/assets/icons/toilet.png";
 import tree from "@/assets/icons/tree.png";
 import wasteMismanagement from "@/assets/icons/waste-mismanagement.png";
 import waterSource from "@/assets/icons/water-source.png";
-import loading from "@/assets/animations/loading.json";
+import loader from "@/assets/animations/loader.json";
+import catLoading from "@/assets/animations/cat_loading.json";
 
 export const images = {
     onboarding1,
@@ -101,7 +102,8 @@ export const icons = {
 };
 
 export const animations = {
-    loading,
+    loader,
+    catLoading,
 };
 
 export const onboarding = [

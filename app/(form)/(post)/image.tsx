@@ -13,7 +13,7 @@ import * as FileSystem from "expo-file-system";
 import { randomUUID } from "expo-crypto";
 import { useCreatePost } from "@/api/post";
 import { useAuth } from "@/providers/AuthProvider";
-
+import ActivityIndicator from "@/components/ActivityIndicator";
 export default function ImageUpload() {
   const { profile } = useAuth();
   const { formData, updateFormData } = useFormContext();
@@ -24,6 +24,7 @@ export default function ImageUpload() {
     longitude: number;
   } | null>(null);
   const { mutate: createPost } = useCreatePost();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const requestLocation = async () => {
@@ -62,6 +63,7 @@ export default function ImageUpload() {
 
   const uploadImage = async () => {
     try {
+      if (!image) throw new Error("No image selected");
       const base64Image = await FileSystem.readAsStringAsync(image, {
         encoding: "base64",
       });
@@ -120,8 +122,9 @@ export default function ImageUpload() {
   };
 
   const handleSubmission = async () => {
-    if (image) {
+    if (image && location) {
       try {
+        setIsSubmitting(true);
         console.log("Starting upload...");
         const imagePath = await uploadImage();
 
@@ -145,6 +148,7 @@ export default function ImageUpload() {
 
         await createPost(createData, {
           onSuccess: (data) => {
+            setIsSubmitting(false);
             console.log("Post created successfully:", data);
             Alert.alert(
               "Success!",
@@ -161,15 +165,15 @@ export default function ImageUpload() {
             );
           },
           onError: (error) => {
+            setIsSubmitting(false);
             console.error("Post creation failed:", error);
-            Alert.alert(
-              "Error",
-              "Failed to submit report. Please try again.",
-              [{ text: "OK" }]
-            );
+            Alert.alert("Error", "Failed to submit report. Please try again.", [
+              { text: "OK" },
+            ]);
           },
         });
       } catch (error) {
+        setIsSubmitting(false);
         console.error("Submission error:", error);
         Alert.alert("Error", "Failed to submit report. Please try again.", [
           { text: "OK" },
@@ -225,13 +229,16 @@ export default function ImageUpload() {
         {/* Next Button */}
         <TouchableOpacity
           onPress={handleSubmission}
-          disabled={!image}
-          className={`p-4 rounded-lg ${image ? "bg-sunagorik" : "bg-gray-300"}`}
+          disabled={!image || isSubmitting}
+          className={`p-4 rounded-lg ${
+            image && !isSubmitting ? "bg-sunagorik" : "bg-gray-300"
+          }`}
         >
           <Text className="text-white text-center font-semibold text-lg">
             Submit
           </Text>
         </TouchableOpacity>
+        {<ActivityIndicator visible={isSubmitting} />}
       </View>
     </SafeAreaView>
   );
