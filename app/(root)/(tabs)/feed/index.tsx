@@ -1,4 +1,4 @@
-import { FilterParams, userPostList } from "@/api/post";
+import { FilterParams, usePostList } from "@/api/post";
 import ReportCard from "@/components/ReportCard";
 import { images } from "@/constants";
 import { useAuth } from "@/providers/AuthProvider";
@@ -37,7 +37,7 @@ const Feed = () => {
     return filters;
   };
 
-  const { data: posts, error, isLoading } = userPostList(getFilterParams());
+  const { data: posts, error, isLoading } = usePostList(getFilterParams());
 
   if (isLoading) {
     return <ActivityIndicator visible={true} />;

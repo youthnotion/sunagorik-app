@@ -47,6 +47,7 @@ import wasteMismanagement from "@/assets/icons/waste-mismanagement.png";
 import waterSource from "@/assets/icons/water-source.png";
 import loader from "@/assets/animations/loader.json";
 import catLoading from "@/assets/animations/cat_loading.json";
+import { CategoryOption } from "@/types/type";
 
 export const images = {
     onboarding1,
@@ -133,3 +134,46 @@ export const onboarding = [
 export const data = {
     onboarding,
 };
+
+export const categories: CategoryOption[] = [
+    {
+      id: "1",
+      title: "Crime Hotspot",
+      image: crimeHotspot, // Adjust path as needed
+    },
+    {
+      id: "2",
+      title: "Drainage Failure",
+      image: drainageFailure,
+    },
+    {
+      id: "3",
+      title: "Overpriced Grocery Shop",
+      image: overpricedShop,
+    },
+    {
+      id: "4",
+      title: "Illegal Road Blocking",
+      image: roadBlocking,
+    },
+    {
+      id: "5",
+      title: "Road Damage",
+      image: roadDamage,
+    },
+    {
+      id: "6",
+      title: "Landmark Tree",
+      image: tree,
+    },
+    {
+      id: "7",
+      title: "Waste Mismanagement",
+      image: wasteMismanagement,
+    },
+    {
+      id: "8",
+      title: "Clean Water Source",
+      image: waterSource,
+    },
+  ];

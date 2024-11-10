@@ -1,62 +1,8 @@
-import { View, Image, TouchableOpacity, Text, ScrollView } from "react-native";
-import { useFormContext } from "../../../providers/PostFormProvider";
+import { categories } from "@/constants";
 import { useRouter } from "expo-router";
-import { StyleSheet } from "react-native";
-import { icons } from "@/constants";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useFormContext } from "../../../providers/PostFormProvider";
 
-interface CategoryOption {
-  id: string;
-  title: string;
-  image: any; // You'll import these images
-}
-
-const categories: CategoryOption[] = [
-  {
-    id: "1",
-    title: "Crime Hotspot",
-    image: icons.crimeHotspot, // Adjust path as needed
-  },
-  {
-    id: "2",
-    title: "Drainage Failure",
-    image: icons.drainageFailure,
-  },
-  {
-    id: "3",
-    title: "Overpriced Grocery Shop",
-    image: icons.overpricedShop,
-  },
-  {
-    id: "4",
-    title: "Illegal Road Blocking",
-    image: icons.roadBlocking,
-  },
-  {
-    id: "5",
-    title: "Road Damage",
-    image: icons.roadDamage,
-  },
-  {
-    id: "6",
-    title: "Accesible Toilet",
-    image: icons.toilet,
-  },
-  {
-    id: "7",
-    title: "Landmark Tree",
-    image: icons.tree,
-  },
-  {
-    id: "8",
-    title: "Waste Mismanagement",
-    image: icons.wasteMismanagement,
-  },
-  {
-    id: "9",
-    title: "Clean Water Source",
-    image: icons.waterSource,
-  },
-];
 
 export default function Category() {
   const { updateFormData } = useFormContext();

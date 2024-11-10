@@ -53,9 +53,6 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     });
   }, []);
 
-  console.log(session);
-
-
   return (
     <AuthContext.Provider
       value={{ session, profile, role: profile?.role || "general", loading }}

@@ -1,7 +1,5 @@
-import { icons } from "@/constants";
+import { categories, icons } from "@/constants";
 import { mapStyle } from "@/constants/mapStyle";
-import { calculateRegion } from "@/lib/map";
-import { useLocationStore } from "@/store";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from 'expo-location';
 import React, { useCallback, useRef, useState } from "react";
@@ -11,129 +9,61 @@ import MapView, {
   PROVIDER_GOOGLE
 } from "react-native-maps";
 
-function generateRandomMarkers(baseMarkers: any[], count: number) {
-  const markers = [...baseMarkers]; // Keep original markers
-  const baseCoord = {
-    latitude: 22.86079,
-    longitude: 91.097788
-  };
-  
-  // 5km in degrees - approximate values
-  const LAT_KM = 0.009;
-  const LNG_KM = 0.009;
-  const RADIUS = 10; // 5km radius
-
-  const titles = ["Waste", "Pothole", "Road Blocked", "Flood", "Tree Down", "Street Light", "Drainage"];
-  const descriptions = [
-    "Waste hasn't been collected",
-    "Deep pothole on the road",
-    "Road blocked by construction",
-    "Water logging issue",
-    "Fallen tree blocking path",
-    "Street light not working",
-    "Drainage system blocked"
-  ];
-
-  for (let i = 0; i < count; i++) {
-    // Generate random angle and distance
-    const angle = Math.random() * 2 * Math.PI;
-    const distance = Math.sqrt(Math.random()) * RADIUS; // sqrt for uniform distribution
-
-    // Convert polar coordinates to lat/lng
-    const latOffset = distance * LAT_KM * Math.cos(angle);
-    const lngOffset = distance * LNG_KM * Math.sin(angle);
-
-    // Random title and description
-    const randomTitleIndex = Math.floor(Math.random() * titles.length);
-    
-    markers.push({
-      title: titles[randomTitleIndex],
-      description: descriptions[randomTitleIndex],
-      coordinate: {
-        latitude: baseCoord.latitude + latOffset,
-        longitude: baseCoord.longitude + lngOffset
-      }
-    });
-  }
-
-  return markers;
+interface Post {
+  id: number;
+  category: string;
+  title: string;
+  lat: number;
+  long: number;
 }
 
-const Map = () => {
-  const {
-    userLongitude,
-    userLatitude,
-    destinationLatitude,
-    destinationLongitude,
-  } = useLocationStore();
+interface MapProps {
+  onRegionChangeComplete: (region: any) => void;
+  posts: Post[];
+}
 
-  const region = calculateRegion({
-    userLongitude,
-    userLatitude,
-    destinationLatitude,
-    destinationLongitude,
-  });
-  // console.log(region);
-
-  const markers = [
-    {
-      title: "Waste",
-      description: "Waste hasnt been collected for a week",
-      coordinate: { latitude: 22.86079, longitude: 91.097788 },
-    },
-    {
-      title: "Pothole",
-      description: "Pothole on the road",
-      coordinate: { latitude: 22.870814, longitude: 91.095526 },
-    },
-    {
-      title: "Road Blocked",
-      description: "Road is blocked by construction materials",
-      coordinate: { latitude: 22.865298, longitude: 91.098512 },
-    },
-    {
-      title: "Flood",
-      description: "Flood in the area",
-      coordinate: { latitude: 22.86937, longitude: 91.096147 },
-    },
-  ];
-
-  const allMarkers = React.useMemo(() => generateRandomMarkers(markers, 1000), []);
-  const [visibleMarkers, setVisibleMarkers] = useState<any[]>([]);
-  const [isRecentering, setIsRecentering] = useState(false);
-
-  const onRegionChangeComplete = useCallback((region) => {
-    requestAnimationFrame(() => {
-      const visible = allMarkers.filter(marker => 
-        marker.coordinate.latitude >= region.latitude - region.latitudeDelta/2 &&
-        marker.coordinate.latitude <= region.latitude + region.latitudeDelta/2 &&
-        marker.coordinate.longitude >= region.longitude - region.longitudeDelta/2 &&
-        marker.coordinate.longitude <= region.longitude + region.longitudeDelta/2
-      ).slice(0, 200); // Limit visible markers for performance
-      setVisibleMarkers(visible);
-    });
-  }, [allMarkers]);
-
+const Map = ({ onRegionChangeComplete, posts }: MapProps) => {
   const mapRef = useRef<MapView>(null);
+  const [region, setRegion] = useState({
+    latitude: 22.866265,
+    longitude: 91.097025,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  });
+
+  const initialRegion = {
+    latitude: 22.866265,
+    longitude: 91.097025,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  };
 
   const recenterToUser = async () => {
     try {
-      setIsRecentering(true);
-      const location = await Location.getCurrentPositionAsync({});
-      // console.log(location);
+      // const location = await Location.getCurrentPositionAsync({});
 
-      const newRegion = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      };
+      // const newRegion = {
+      //   latitude: location.coords.latitude,
+      //   longitude: location.coords.longitude,
+      //   latitudeDelta: 0.01,
+      //   longitudeDelta: 0.01,
+      // };
       
-      mapRef.current?.animateToRegion(newRegion, 4000);
+      mapRef.current?.animateToRegion(initialRegion, 3000);
     } catch (error) {
       console.log('Error getting location:', error);
-    } finally {
-      setIsRecentering(false);
+    }
+  };
+
+  // Bangladesh boundaries
+  const bangladeshBounds = {
+    northEast: {
+      latitude: 26.634,
+      longitude: 92.673
+    },
+    southWest: {
+      latitude: 20.743,
+      longitude: 88.028
     }
   };
 
@@ -145,21 +75,35 @@ const Map = () => {
         customMapStyle={mapStyle}
         className="w-full h-full rounded-2xl"
         tintColor="black"
-        initialRegion={region}
+        initialRegion={initialRegion}
         showsUserLocation={true}
         showsMyLocationButton={false}
         userInterfaceStyle="light"
         zoomEnabled={true}
-    
-        onRegionChangeComplete={onRegionChangeComplete}
+        minZoomLevel={7}
+        mapPadding={{ top: 0, right: 0, bottom: 0, left: 0 }}
+        region={region}
+        onRegionChangeComplete={(newRegion) => {
+          // Prevent moving outside Bangladesh bounds
+          const constrainedRegion = {
+            ...newRegion,
+            latitude: Math.min(Math.max(newRegion.latitude, bangladeshBounds.southWest.latitude), bangladeshBounds.northEast.latitude),
+            longitude: Math.min(Math.max(newRegion.longitude, bangladeshBounds.southWest.longitude), bangladeshBounds.northEast.longitude),
+          };
+          setRegion(constrainedRegion);
+          onRegionChangeComplete(constrainedRegion);
+        }}
       >
-        {visibleMarkers.map((marker, index) => (
+        {posts.map((post) => (
           <Marker
-            key={index}
-            coordinate={marker.coordinate}
-            title={marker.title}
-            description={marker.description}
-            image={icons.tree}
+            key={post.id}
+            coordinate={{
+              latitude: post.lat,
+              longitude: post.long
+            }}
+            title={post.category}
+            description={post.title}
+            image={categories.find((category) => category.title === post.category)?.image}
             tracksViewChanges={false}
           />
         ))}
@@ -167,14 +111,9 @@ const Map = () => {
 
       <TouchableOpacity
         onPress={recenterToUser}
-        disabled={isRecentering}
         className={`absolute bottom-56 right-5 bg-sunagorik w-[60px] h-[60px] rounded-2xl items-center justify-center shadow-lg shadow-black`}
       >
-        {isRecentering ? (
-          <ActivityIndicator color="white" size="small" />
-        ) : (
-          <Ionicons name="locate" size={26} color="white" />
-        )}
+        <Ionicons name="locate" size={26} color="white" />
       </TouchableOpacity>
     </View>
   );

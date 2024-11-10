@@ -23,7 +23,7 @@ export interface FilterParams {
   user_id?: string; // user ID for filtering my posts
 }
 
-export const userPostList = (filters?: FilterParams) => {
+export const usePostList = (filters?: FilterParams) => {
   return useQuery({
     queryKey: ["posts", filters],
     queryFn: async () => {
@@ -149,3 +149,36 @@ export const useCreatePost = () => {
     },
   });
 };
+
+
+export const usePostsInView = (region: { latitude: number, longitude: number, latitudeDelta: number, longitudeDelta: number }) => {
+  const queryClient = useQueryClient();
+
+  return useQuery({
+    queryKey: ['posts-in-view', region],
+    queryFn: async () => {
+      const minLat = region.latitude - region.latitudeDelta / 2;
+      const maxLat = region.latitude + region.latitudeDelta / 2;
+      const minLong = region.longitude - region.longitudeDelta / 2;
+      const maxLong = region.longitude + region.longitudeDelta / 2;
+
+      const { data: posts_in_view, error } = await supabase.rpc('posts_in_view', {
+        min_lat: minLat,
+        min_long: minLong,
+        max_lat: maxLat,
+        max_long: maxLong
+      });
+
+      console.log("posts_in_view", posts_in_view);
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw new Error(error.message);
+      }
+
+      return posts_in_view ?? [];
+    } ,
+    staleTime: 1000 * 60 * 5, // Data considered fresh for 5 minutes
+    gcTime: 1000 * 60 * 30, 
+  })
+}

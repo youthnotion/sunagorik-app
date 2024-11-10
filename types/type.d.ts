@@ -58,6 +58,12 @@ declare interface SeverityRating {
     rating: number;
 }
 
+declare interface CategoryOption {
+    id: string;
+    title: string;
+    image: string;
+}
+
 declare interface ButtonProps extends TouchableOpacityProps {
     title: string;
     bgVariant?: "primary" | "secondary" | "danger" | "outline" | "outline-color" | "success";
