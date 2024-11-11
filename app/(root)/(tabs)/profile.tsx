@@ -1,16 +1,20 @@
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AntDesign from '@expo/vector-icons/AntDesign';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from "@/providers/AuthProvider";
 import RemoteImage from "@/components/RemoteImage";
 import { getImageUrl } from "@/lib/supabase";
+import CustomButton from "@/components/CustomButton";
 
 const Profile = () => {
   const { profile } = useAuth();
 
   return (
     <SafeAreaView>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
 
       {/* Profile Card */}
       <View className="bg-sunagorik m-4 p-4 rounded-xl shadow-sm">
@@ -175,6 +179,30 @@ const Profile = () => {
           </View>
         </View>
       </View>
+
+      {/* Logout Button */}
+          <View className="flex-row w-full p-4">
+            <View className="flex-1 mr-2">
+              <CustomButton
+                title="  Logout"
+                IconLeft={() => (
+                  <AntDesign name="logout" size={20} color="white" />
+                )}
+                onPress={() => {}}
+              />
+            </View>
+            <View className="flex-1 ml-2">
+              <CustomButton
+                bgVariant="secondary"
+                title="  Language"
+                IconLeft={() => (
+                  <Ionicons name="language" size={24} color="white" />
+                )}
+                onPress={() => {}}
+              />
+        </View>
+      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

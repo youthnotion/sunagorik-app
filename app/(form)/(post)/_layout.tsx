@@ -7,7 +7,7 @@ const Layout = () => {
       <Stack>
         <Stack.Screen
           name="category"
-          options={{ title: "Category", headerShown: true }}
+          options={{ title: "Category", headerShown: true, headerBackVisible: false }}
         />
         <Stack.Screen
           name="body"

@@ -27,26 +27,24 @@ export const usePostList = (filters?: FilterParams) => {
   return useQuery({
     queryKey: ["posts", filters],
     queryFn: async () => {
-      let query = supabase
-        .from("posts")
-        .select(`
+      let query = supabase.from("posts").select(`
           *,
           reporter:reported_by (
             full_name
           )
         `);
 
-        if (filters?.status?.length) {
-          query = query.in('status', filters.status);
-        }
-        
-        if (filters?.severity) {
-          query = query.gte('severity_score', 4);
-        }
-  
-        if (filters?.user_id) {
-          query = query.eq('reported_by', filters.user_id);
-        }
+      if (filters?.status?.length) {
+        query = query.in("status", filters.status);
+      }
+
+      if (filters?.severity) {
+        query = query.gte("severity_score", 4);
+      }
+
+      if (filters?.user_id) {
+        query = query.eq("reported_by", filters.user_id);
+      }
 
       const { data, error } = await query;
 
@@ -64,13 +62,15 @@ export const usePost = (id: number) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("posts")
-        .select(`
+        .select(
+          `
           *,
           reporter:reported_by (
             full_name,
             avatar_url
           )
-        `)
+        `
+        )
         .eq("id", id)
         .single();
       if (error) {
@@ -90,7 +90,7 @@ export const usePost = (id: number) => {
 // }
 
 // export const useNearbyPosts = (
-//   latitude: number, 
+//   latitude: number,
 //   longitude: number,
 //   filters?: FilterParams
 // ) => {
@@ -119,18 +119,20 @@ export const useCreatePost = () => {
 
   return useMutation({
     async mutationFn(data: Omit<PostData, "id">) {
-      const { error, data: createdPost } = await supabase
-      .rpc('insert_post_and_severity', {
-        title: data.title,
-        category: data.category,
-        description: data.description,
-        longitude: data.location.longitude,
-        latitude: data.location.latitude,
-        image: data.image,
-        severity_score: data.severity_score,
-        reported_by: data.reported_by,
-        neighborhood: "default"
-      });
+      const { error, data: createdPost } = await supabase.rpc(
+        "insert_post_and_severity",
+        {
+          title: data.title,
+          category: data.category,
+          description: data.description,
+          longitude: data.location.longitude,
+          latitude: data.location.latitude,
+          image: data.image,
+          severity_score: data.severity_score,
+          reported_by: data.reported_by,
+          neighborhood: "default",
+        }
+      );
 
       if (error) {
         console.error("Supabase error:", error);
@@ -150,24 +152,68 @@ export const useCreatePost = () => {
   });
 };
 
+export const useUpdatePostStatus = () => {
+  const queryClient = useQueryClient();
 
-export const usePostsInView = (region: { latitude: number, longitude: number, latitudeDelta: number, longitudeDelta: number }) => {
+  return useMutation({
+    async mutationFn(data: {
+      id: number;
+      status: string;
+      status_updated_by: string;
+      status_note: string;
+    }) {
+      const { error } = await supabase
+        .from("posts")
+        .update({
+          status: data.status,
+          status_note: data.status_note,
+          status_updated_by: data.status_updated_by,
+          status_updated_at: new Date().toISOString(),
+        })
+        .eq("id", data.id);
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["posts", data.id] });
+      console.log("Post status updated successfully:", data);
+    },
+    onError: (error) => {
+      console.error("Mutation error:", error);
+    },
+  });
+};
+
+export const usePostsInView = (region: {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+}) => {
   const queryClient = useQueryClient();
 
   return useQuery({
-    queryKey: ['posts-in-view', region],
+    queryKey: ["posts-in-view", region],
     queryFn: async () => {
       const minLat = region.latitude - region.latitudeDelta / 2;
       const maxLat = region.latitude + region.latitudeDelta / 2;
       const minLong = region.longitude - region.longitudeDelta / 2;
       const maxLong = region.longitude + region.longitudeDelta / 2;
 
-      const { data: posts_in_view, error } = await supabase.rpc('posts_in_view', {
-        min_lat: minLat,
-        min_long: minLong,
-        max_lat: maxLat,
-        max_long: maxLong
-      });
+      const { data: posts_in_view, error } = await supabase.rpc(
+        "posts_in_view",
+        {
+          min_lat: minLat,
+          min_long: minLong,
+          max_lat: maxLat,
+          max_long: maxLong,
+        }
+      );
 
       console.log("posts_in_view", posts_in_view);
 
@@ -177,8 +223,8 @@ export const usePostsInView = (region: { latitude: number, longitude: number, la
       }
 
       return posts_in_view ?? [];
-    } ,
+    },
     staleTime: 1000 * 60 * 5, // Data considered fresh for 5 minutes
-    gcTime: 1000 * 60 * 30, 
-  })
-}
+    gcTime: 1000 * 60 * 30,
+  });
+};

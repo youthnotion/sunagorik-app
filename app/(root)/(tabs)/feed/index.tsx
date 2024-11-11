@@ -37,7 +37,7 @@ const Feed = () => {
     return filters;
   };
 
-  const { data: posts, error, isLoading } = usePostList(getFilterParams());
+  const { data: posts, error, isLoading, refetch: refetchPosts } = usePostList(getFilterParams());
 
   if (isLoading) {
     return <ActivityIndicator visible={true} />;
@@ -94,6 +94,8 @@ const Feed = () => {
             </>
           </View>
         )}
+        refreshing={isLoading}
+        onRefresh={() => refetchPosts()}
       />
     </SafeAreaView>
   );

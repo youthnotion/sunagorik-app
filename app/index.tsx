@@ -1,8 +1,8 @@
 import { Redirect } from "expo-router";
 import React from "react";
 import { useAuth } from "@/providers/AuthProvider";
-import ActivityIndicator from "@/components/ActivityIndicator";
 import { View } from "react-native";
+import ActivityIndicator from "@/components/ActivityIndicator";
 
 const Home = () => {
   const { session, loading, profile } = useAuth();
