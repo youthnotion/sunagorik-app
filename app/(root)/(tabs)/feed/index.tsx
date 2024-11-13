@@ -1,27 +1,44 @@
-import { FilterParams, usePostList } from "@/api/post";
+import { FilterParams, usePostList } from "@/api/post/index";
+import ActivityIndicator from "@/components/ActivityIndicator";
+import { ActivityIndicator as RNActivityIndicator } from "react-native";
 import ReportCard from "@/components/ReportCard";
 import { images } from "@/constants";
 import { useAuth } from "@/providers/AuthProvider";
-import React, { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
 import {
-  View,
-  StyleSheet,
-  Text,
   FlatList,
   Image,
   Pressable,
+  Text,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ActivityIndicator from "@/components/ActivityIndicator";
 
+
+const MemoizedReportCard = memo(ReportCard);
+
+const EmptyListComponent = memo(() => (
+  <View className="flex flex-col items-center justify-center">
+    <Image
+      source={images.noResult}
+      className="w-40 h-40"
+      alt="We can't find any posts right now!"
+      resizeMode="contain"
+    />
+    <Text className="text-sm">
+      We can't find any posts right now!
+    </Text>
+  </View>
+));
 
 const Feed = () => {
   const { profile } = useAuth();
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   
-  // Transform UI status to database status
-  const getFilterParams = () => {
-    const filters: FilterParams = {};
+  const getFilterParams = useCallback(() => {
+    const filters: FilterParams = {
+      limit: 5,
+    };
     
     selectedFilters.forEach(status => {
       if (status === "Severe") {
@@ -35,9 +52,34 @@ const Feed = () => {
     });
     
     return filters;
+  }, [selectedFilters, profile?.id]);
+
+  const { 
+    data, 
+    error, 
+    isLoading, 
+    isFetchingNextPage, 
+    hasNextPage, 
+    fetchNextPage, 
+    refetch 
+  } = usePostList(getFilterParams());
+
+  const loadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const renderFooter = () => {
+    if (!isFetchingNextPage) return null;
+    return <RNActivityIndicator size="small" color="#000" />;
   };
 
-  const { data: posts, error, isLoading, refetch: refetchPosts } = usePostList(getFilterParams());
+  const flattenedPosts = data?.pages.flatMap(page => page.data) ?? [];
+
+  const renderItem = useCallback(({ item }) => (
+    <MemoizedReportCard post={item} />
+  ), []);
 
   if (isLoading) {
     return <ActivityIndicator visible={true} />;
@@ -75,27 +117,20 @@ const Feed = () => {
 
       <FlatList
         showsVerticalScrollIndicator={false}
-        data={posts}
-        renderItem={({ item }) => <ReportCard post={item} />}
+        data={flattenedPosts}
+        renderItem={renderItem}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 160 }}
-        ListEmptyComponent={() => (
-          <View className="flex flex-col items-center justify-center">
-              <>
-                <Image
-                  source={images.noResult}
-                  className="w-40 h-40"
-                  alt="We can't find any posts right now!"
-                  resizeMode="contain"
-              />
-              <Text className="text-sm">
-                We can't find any posts right now!
-              </Text>
-            </>
-          </View>
-        )}
+        ListEmptyComponent={EmptyListComponent}
+        ListFooterComponent={renderFooter}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
         refreshing={isLoading}
-        onRefresh={() => refetchPosts()}
+        onRefresh={refetch}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={5}
+        windowSize={5}
+        initialNumToRender={5}
       />
     </SafeAreaView>
   );

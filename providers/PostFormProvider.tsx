@@ -10,6 +10,7 @@ interface FormData {
     longitude: number;
   };
   severity: number;
+  neighborhood: string;
 }
 
 interface FormContextType {
@@ -25,6 +26,7 @@ export function FormProvider({ children }: { children: ReactNode }) {
     category: '',
     title: '',
     description: '',
+    neighborhood: '',
     image: null,
     location: {
       latitude: 0,
@@ -42,6 +44,7 @@ export function FormProvider({ children }: { children: ReactNode }) {
       category: '',
       title: '',
       description: '',
+      neighborhood: '',
       image: null,
       location: {
         latitude: 0,

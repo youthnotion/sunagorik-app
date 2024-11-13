@@ -11,7 +11,7 @@ import { decode } from "base64-arraybuffer";
 import { supabase } from "@/lib/supabase";
 import * as FileSystem from "expo-file-system";
 import { randomUUID } from "expo-crypto";
-import { useCreatePost } from "@/api/post";
+import { useCreatePost } from "@/api/post/index";
 import { useAuth } from "@/providers/AuthProvider";
 import ActivityIndicator from "@/components/ActivityIndicator";
 export default function ImageUpload() {
@@ -140,6 +140,7 @@ export default function ImageUpload() {
           description: formData.description,
           image: imagePath,
           location: location,
+          neighborhood: formData.neighborhood,
           severity_score: formData.severity,
           reported_by: profile?.id,
         };
@@ -158,7 +159,7 @@ export default function ImageUpload() {
                   text: "OK",
                   onPress: () => {
                     updateFormData({});
-                    router.replace("/(tabs)/home");
+                    router.replace("/(tabs)/feed");
                   },
                 },
               ]
@@ -226,7 +227,7 @@ export default function ImageUpload() {
           </TouchableOpacity>
         </View>
 
-        {/* Next Button */}
+        {/* Submit Button */}
         <TouchableOpacity
           onPress={handleSubmission}
           disabled={!image || isSubmitting}

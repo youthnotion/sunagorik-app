@@ -1,31 +1,60 @@
 import { categories } from "@/constants";
 import { useRouter } from "expo-router";
-import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useFormContext } from "../../../providers/PostFormProvider";
-import * as Location from 'expo-location';
+import * as Location from "expo-location";
 import { useEffect } from "react";
-
 
 export default function Category() {
   const { updateFormData } = useFormContext();
   const router = useRouter();
 
   useEffect(() => {
+    const checkLocationPermission = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert(
+            "Permission Denied",
+            "Location permission is required to post your report",
+            [
+              { text: "OK", onPress: () => router.replace("/(tabs)/home") }
+            ]
+          );
+          return;
+        }
+
+        const enabled = await Location.hasServicesEnabledAsync();
+        if (!enabled) {
+          Alert.alert(
+            "Location Services Disabled",
+            "Please enable location services in your device settings to post your report",
+            [
+              { text: "OK", onPress: () => router.replace("/(tabs)/home") }
+            ]
+          );
+          return;
+        }
+      } catch (error) {
+        Alert.alert(
+          "Error",
+          "Unable to access location services",
+          [
+            { text: "OK", onPress: () => router.replace("/(tabs)/home") }
+          ]
+        );
+      }
+    };
+
     checkLocationPermission();
   }, []);
-
-  const checkLocationPermission = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(
-        "Permission Denied",
-        "Location permission is required to post your report",
-        [
-          { text: "OK", onPress: () => router.replace("/(tabs)/home") }
-        ]
-      );
-    }
-  };
 
   return (
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>

@@ -1,4 +1,4 @@
-import { usePostsInView } from "@/api/post";
+import { usePostsInView } from "@/api/post/index";
 import FloatingButton from "@/components/FloatingButton";
 import Map from "@/components/Map";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";

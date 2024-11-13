@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { Report } from "@/types/type";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface PostData {
   id: string;
@@ -12,27 +12,47 @@ interface PostData {
     latitude: number;
     longitude: number;
   };
+  neighborhood: string;
   severity_score: number;
   reported_by: string;
 }
 
 // Add interface for filter params
 export interface FilterParams {
+  page: number;
   status?: string[];
   severity?: boolean;
-  user_id?: string; // user ID for filtering my posts
+  user_id?: string;
+  limit?: number;
 }
 
 export const usePostList = (filters?: FilterParams) => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["posts", filters],
-    queryFn: async () => {
-      let query = supabase.from("posts").select(`
-          *,
+    queryFn: async ({ pageParam = 0 }) => {
+      const defaultLimit = 5; // Changed to 5 to match your logs
+      const from = pageParam * defaultLimit;
+      const to = from + defaultLimit - 1;
+
+      console.log(`Fetching posts from ${from} to ${to}`);
+
+      let query = supabase
+        .from("posts")
+        .select(`
+          id,
+          title,
+          category,
+          image,
+          status,
+          created_at,
+          neighborhood,
+          severity_score,
           reporter:reported_by (
             full_name
           )
-        `);
+        `, { count: 'exact' })
+        .order("created_at", { ascending: false })
+        .range(from, to);
 
       if (filters?.status?.length) {
         query = query.in("status", filters.status);
@@ -46,13 +66,23 @@ export const usePostList = (filters?: FilterParams) => {
         query = query.eq("reported_by", filters.user_id);
       }
 
-      const { data, error } = await query;
+      const { data, error, count } = await query;
 
       if (error) {
         throw new Error(error.message);
       }
-      return data;
+
+      return {
+        data: data || [],
+        nextPage: pageParam + 1,
+        count: count || 0
+      };
     },
+    getNextPageParam: (lastPage, allPages) => {
+      const totalFetched = allPages.reduce((total, page) => total + page.data.length, 0);
+      return totalFetched < lastPage.count ? lastPage.nextPage : undefined;
+    },
+    initialPageParam: 0,
   });
 };
 
@@ -130,7 +160,7 @@ export const useCreatePost = () => {
           image: data.image,
           severity_score: data.severity_score,
           reported_by: data.reported_by,
-          neighborhood: "default",
+          neighborhood: data.neighborhood,
         }
       );
 

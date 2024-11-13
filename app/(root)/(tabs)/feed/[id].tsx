@@ -1,5 +1,5 @@
 import { useCreateFalseReport, useFalseReports } from "@/api/false_report";
-import { usePost, useUpdatePostStatus } from "@/api/post";
+import { usePost, useUpdatePostStatus } from "@/api/post/index";
 import {
   useCreateSeverityRating,
   useSeverityRatings,
@@ -11,9 +11,7 @@ import { getImageUrl } from "@/lib/supabase";
 import { formatDate } from "@/lib/utils";
 import { useAuth } from "@/providers/AuthProvider";
 import {
-  AntDesign,
-  Ionicons,
-  MaterialCommunityIcons,
+  MaterialCommunityIcons
 } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -27,9 +25,8 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 const ReportDetailScreen = () => {
