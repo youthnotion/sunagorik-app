@@ -32,7 +32,7 @@ const InputField = ({
             {label}
           </Text>
           <View
-            className={`flex flex-row justify-start items-center relative bg-neutral-100 rounded-lg border border-neutral-100 focus:border-sunagorik ${containerStyle}`}
+            className={`flex flex-row justify-start items-center relative bg-white rounded-lg border border-gray-200 focus:border-sunagorik ${containerStyle}`}
           >
             {icon && (
               <Image source={icon} className={`w-6 h-6 ml-4 ${iconStyle}`} />

@@ -1,82 +1,75 @@
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFormContext } from "../../../providers/ProfileFormProvider";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import InputField from "@/components/InputField";
+import CustomButton from "@/components/CustomButton";
+import ErrorMessage from "@/components/ErrorMessage";
+
+const validationSchema = Yup.object().shape({
+  username: Yup.string().required('Username is required').min(3, 'Username must be at least 3 characters long'),
+  fullName: Yup.string().required('Full name is required').min(10, 'Full name must be at least 10 characters long'),
+});
 
 export default function FormBody() {
   const { formData, updateProfileData } = useFormContext();
   const router = useRouter();
 
-  const [username, setUsername] = useState(formData.username || "");
-  const [fullName, setFullName] = useState(formData.fullName || "");
-  const [neighborhood, setNeighborhood] = useState(formData.neighborhood || "");
-
-  const isFormValid = username.trim() && fullName.trim() && neighborhood.trim();
-
-  const handleNext = () => {
-    if (isFormValid) {
-      updateProfileData({
-        username,
-        fullName,
-        neighborhood,
-      });
+  const formik = useFormik({
+    initialValues: {
+      username: formData.username || '',
+      fullName: formData.fullName || '',
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      updateProfileData(values);
       router.push("/(form)/(profile)/about");
-    }
-  };
-
+    },
+  });
 
   return (
-    <SafeAreaView className="flex-1 p-2">
-      {/* Username Input */}
-      <View className="mb-4">
-        <Text className="text-gray-700 text-base mb-2 font-medium">Username</Text>
-        <TextInput
-          value={username}
-          onChangeText={setUsername}
+    <SafeAreaView className="flex-1 p-4">
+      <ScrollView showsVerticalScrollIndicator={false}>
+      <View className="items-center mb-2">
+        <View className="bg-gray-100 p-6 rounded-full">
+          <FontAwesome name="user-circle-o" size={80} color="#CF322C" />
+        </View>
+      </View>
+
+      <View>
+        <InputField
+          value={formik.values.username}
+          label="Username"
+          onChangeText={formik.handleChange('username')}
+          onBlur={formik.handleBlur('username')}
           placeholder="Enter username"
-          className="w-full bg-white p-4 rounded-lg border border-gray-200"
         />
+        <ErrorMessage error={formik.errors.username} visible={formik.touched.username} />
       </View>
 
-      {/* Full Name Input */}
-      <View className="mb-4">
-        <Text className="text-gray-700 text-base mb-2 font-medium">
-          Full Name
-        </Text>
-        <TextInput
-          value={fullName}
-          onChangeText={setFullName}
+      <View>
+        <InputField
+          value={formik.values.fullName}
+          label="Full Name"
+          onChangeText={formik.handleChange('fullName')}
+          onBlur={formik.handleBlur('fullName')}
           placeholder="Enter full name"
-          className="w-full bg-white p-4 rounded-lg border border-gray-200"
         />
+        <ErrorMessage error={formik.errors.fullName} visible={formik.touched.fullName} />
       </View>
 
-      {/* Neighborhood Input */}
-      <View className="mb-4">
-        <Text className="text-gray-700 text-base mb-2 font-medium">
-          Neighborhood
-        </Text>
-        <TextInput
-          value={neighborhood}
-          onChangeText={setNeighborhood}
-          placeholder="Enter neighborhood"
-          className="w-full bg-white p-4 rounded-lg border border-gray-200"
-        />
-      </View>
-
-      {/* Next Button */}
-      <TouchableOpacity
-        onPress={handleNext}
-        disabled={!isFormValid}
-        className={`p-4 rounded-lg ${
-          isFormValid ? "bg-sunagorik" : "bg-gray-300"
+      <CustomButton
+        title="Next"
+        onPress={formik.handleSubmit}
+        disabled={!formik.isValid || !formik.dirty}
+        className={`mt-8 p-4 rounded-lg ${
+          formik.isValid && formik.dirty ? "bg-sunagorik" : "bg-gray-300"
         }`}
-      >
-        <Text className="text-white text-center font-semibold text-lg">
-          Next
-        </Text>
-      </TouchableOpacity>
+      />
+      </ScrollView>
     </SafeAreaView>
   );
 }

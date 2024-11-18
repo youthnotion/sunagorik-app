@@ -9,6 +9,8 @@ import React from "react";
 import { Alert, Image, ScrollView, Text, View } from "react-native";
 import * as Yup from 'yup';
 import { supabase } from "@/lib/supabase";
+import { useState } from "react";
+import ActivityIndicator from "@/components/ActivityIndicator";
 
 const validationSchema = Yup.object().shape({
   // name: Yup.string().required('Name is required').min(3, 'Name must be at least 3 characters'),
@@ -17,24 +19,38 @@ const validationSchema = Yup.object().shape({
 });
 
 const SignUp = () => {
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSignUpPress = async (values: { email: string, password: string }) => {
-    const { data, error } = await supabase.auth.signUp({
-      email: values.email,
-      password: values.password,
-    });
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
+      });
 
-    if (error) {
-      Alert.alert('Error', error.message);
+      if (error) {
+        Alert.alert('Error', error.message);
+      }
+      else if (data) {
+        Alert.alert('Success', 'Account created successfully', [{ 
+          text: 'OK', 
+          onPress: () => {
+            router.replace('/(auth)/sign-in');
+          } 
+        }]);
+        console.log(data);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
     }
-
-    else if (data) {
-      Alert.alert('Success', 'Account created successfully', [{ text: 'OK', onPress: () => {
-        router.replace('/(auth)/sign-in');
-      } }]);
-    }
-
   };
+
+  if (isLoading) {
+    return <ActivityIndicator visible={isLoading} />;
+  }
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -58,15 +74,6 @@ const SignUp = () => {
           >
             {({ handleChange, handleSubmit, values, errors, touched, setFieldTouched }) => (
               <>
-                {/* <InputField
-                  label="Name"
-                  placeholder="Enter your name"
-                  icon={icons.person}
-                  value={values.name}
-                  onChangeText={handleChange('name')}
-                  onBlur={() => setFieldTouched('name')}
-                />
-                <ErrorMessage error={errors.name} visible={touched.name} /> */}
 
                 <InputField
                   label="Email"

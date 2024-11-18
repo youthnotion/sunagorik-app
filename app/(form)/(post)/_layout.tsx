@@ -14,6 +14,10 @@ const Layout = () => {
           options={{ title: "Your Report", headerShown: true }}
         />
         <Stack.Screen
+          name="details"
+          options={{ title: "Description", headerShown: true }}
+        />
+        <Stack.Screen
           name="image"
           options={{ title: "Upload Image", headerShown: true }}
         />

@@ -1,3 +1,4 @@
+import ActivityIndicator from "@/components/ActivityIndicator";
 import CustomButton from "@/components/CustomButton";
 import ErrorMessage from "@/components/ErrorMessage";
 import InputField from "@/components/InputField";
@@ -22,37 +23,77 @@ const validationSchema = Yup.object().shape({
 });
 
 const SignIn = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const onSignInPress = async (values: { email: string; password: string }) => {
-    const { data: authData, error: authError } =
-      await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      });
+    setIsLoading(true);
+    try {
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email: values.email,
+          password: values.password,
+        });
 
-    if (authError) {
-      Alert.alert(authError.message);
-      console.log(authError.message);
+      if (authError) {
+        if (authError.message.toLowerCase().includes('email not confirmed')) {
+          Alert.alert(
+            "Email Not Verified",
+            "Would you like to resend the verification email?",
+            [
+              {
+                text: "Cancel",
+                style: "cancel"
+              },
+              {
+                text: "Resend",
+                onPress: async () => {
+                  const { error } = await supabase.auth.resend({
+                    type: 'signup',
+                    email: values.email,
+                  });
+                  if (error) {
+                    Alert.alert("Error", error.message);
+                  } else {
+                    Alert.alert("Success", "Verification email sent! Please check your inbox.");
+                  }
+                }
+              }
+            ]
+          );
+        } else {
+          Alert.alert("Error", authError.message);
+        }
+        return;
+      }
+
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select()
+        .eq("id", authData.user?.id)
+        .single();
+
+      if (profileError) {
+        Alert.alert(profileError.message);
+      }
+
+      else if (profileData.username === null) {
+        console.log(profileError);
+        router.replace("/(form)/(profile)/body");
+      } else {
+        console.log(profileData);
+        router.replace("/(tabs)/home");
+      }
+
+    } catch (error) {
+      Alert.alert("Error", "An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
     }
-
-    const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .select()
-      .eq("id", authData.user?.id)
-      .single();
-
-    if (profileError) {
-      Alert.alert(profileError.message);
-    }
-
-    else if (profileData.username === null) {
-      console.log(profileError);
-      router.replace("/(form)/(profile)/body");
-    } else {
-      console.log(profileData);
-      router.replace("/(tabs)/home");
-    }
-
   };
+
+  if (isLoading) {
+    return <ActivityIndicator visible={isLoading} />;
+  }
 
   return (
     <ScrollView className="flex-1 bg-white">

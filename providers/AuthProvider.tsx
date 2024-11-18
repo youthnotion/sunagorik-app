@@ -42,15 +42,35 @@ export default function AuthProvider({ children }: PropsWithChildren) {
           .eq("id", session.user.id)
           .single();
         setProfile(profile || null);
+      } else {
+        // Clear profile when no session exists
+        setProfile(null);
       }
-
       setLoading(false)
     };
     
     fetchSession();
-    supabase.auth.onAuthStateChange((_event, session) => {
-        setSession(session);
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
+      if (!session) {
+        // Clear profile on logout
+        setProfile(null);
+      } else {
+        // Fetch new profile data on login
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        setProfile(profile || null);
+      }
     });
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -59,7 +79,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     >
       {children}
     </AuthContext.Provider>
-  )
+  );
 }
 
 export const useAuth = () => useContext(AuthContext);

@@ -88,7 +88,7 @@ const Feed = () => {
   return (
     <SafeAreaView className="px-2">
       <View className="flex flex-row justify-between">
-        {["My Posts", "Initiated", "In Progress", "Resolved", "Severe"].map(
+        {["My Posts", "Pending", "In Progress", "Resolved", "Severe"].map(
           (status) => (
             <Pressable
               key={status}

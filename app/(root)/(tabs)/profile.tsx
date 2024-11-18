@@ -1,16 +1,29 @@
-import React from "react";
-import { View, Text, Image, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useUserReportStats } from "@/api/post/index";
+import ActivityIndicator from "@/components/ActivityIndicator";
+import CustomButton from "@/components/CustomButton";
+import { getImageUrl, supabase } from "@/lib/supabase";
+import { useAuth } from "@/providers/AuthProvider";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AntDesign from '@expo/vector-icons/AntDesign';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useAuth } from "@/providers/AuthProvider";
-import RemoteImage from "@/components/RemoteImage";
-import { getImageUrl } from "@/lib/supabase";
-import CustomButton from "@/components/CustomButton";
+import { router } from "expo-router";
+import React from "react";
+import { Image, ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Profile = () => {
   const { profile } = useAuth();
+  const { data: userReportStats, isLoading } = useUserReportStats(profile?.id);
+
+  const logout = () => {
+    supabase.auth.signOut();
+    router.replace("/(auth)/sign-in");
+  }
+
+  if (isLoading) {
+    return <ActivityIndicator visible={true} />
+  }
+
+  console.log(profile);
 
   return (
     <SafeAreaView>
@@ -37,6 +50,12 @@ const Profile = () => {
               {profile?.neighborhood}
             </Text>
           </View>
+          {/* <TouchableOpacity 
+            onPress={() => router.push("/(form)/(profile)/body")}
+            className="p-2 bg-white/20 rounded-full"
+          >
+            <MaterialCommunityIcons name="pencil" size={20} color="white" />
+          </TouchableOpacity> */}
         </View>
         <Text className="text-base text-gray-200 mb-3 leading-relaxed">
           {profile?.about}
@@ -55,7 +74,7 @@ const Profile = () => {
               />
             </View>
             <View className="ml-2">
-              <Text className="text-4xl font-bold text-sunagorik">28</Text>
+              <Text className="text-4xl font-bold text-sunagorik">{userReportStats?.total}</Text>
               <Text className="text-sm text-gray-600">Reports Posted</Text>
             </View>
           </View>
@@ -70,7 +89,7 @@ const Profile = () => {
               />
             </View>
             <View className="ml-2">
-              <Text className="text-4xl font-bold text-sunagorik">6</Text>
+              <Text className="text-4xl font-bold text-sunagorik">{userReportStats?.resolved}</Text>
               <Text className="text-sm text-gray-600">Resolved</Text>
             </View>
           </View>
@@ -83,14 +102,14 @@ const Profile = () => {
           <View className="flex-row items-start">
             <View className="p-1">
               <MaterialCommunityIcons
-                name="star-outline"
+                name="progress-clock"
                 size={24}
                 color="#CF322C"
               />
             </View>
             <View className="ml-2">
-              <Text className="text-4xl font-bold text-sunagorik">15</Text>
-              <Text className="text-sm text-gray-600">Pending</Text>
+              <Text className="text-4xl font-bold text-sunagorik">{userReportStats?.in_progress}</Text>
+              <Text className="text-sm text-gray-600">In Progress</Text>
             </View>
           </View>
         </View>
@@ -114,14 +133,13 @@ const Profile = () => {
       </View>
 
       {/* Achievements Card */}
-      <View className="mt-4 px-4">
+      {/* <View className="mt-4 px-4">
         <View className="bg-white p-4 rounded-xl shadow-sm">
           <Text className="text-lg font-semibold text-gray-800 mb-4">
             Achievements
           </Text>
 
           <View className="flex-row flex-wrap justify-between">
-            {/* First Time Reporter Badge */}
             <View className="items-center mb-4 w-[22%]">
               <View className="bg-gray-50 p-3 rounded-full">
                 <MaterialCommunityIcons
@@ -135,7 +153,6 @@ const Profile = () => {
               </Text>
             </View>
 
-            {/* Problem Solver Badge */}
             <View className="items-center mb-4 w-[22%]">
               <View className="bg-gray-50 p-3 rounded-full">
                 <MaterialCommunityIcons
@@ -149,7 +166,6 @@ const Profile = () => {
               </Text>
             </View>
 
-            {/* Top Contributor Badge */}
             <View className="items-center mb-4 w-[22%]">
               <View className="bg-gray-50 p-3 rounded-full">
                 <MaterialCommunityIcons
@@ -163,7 +179,6 @@ const Profile = () => {
               </Text>
             </View>
 
-            {/* Community Hero Badge */}
             <View className="items-center mb-4 w-[22%]">
               <View className="bg-gray-50 p-3 rounded-full">
                 <MaterialCommunityIcons
@@ -178,20 +193,22 @@ const Profile = () => {
             </View>
           </View>
         </View>
-      </View>
+      </View> */}
 
       {/* Logout Button */}
-          <View className="flex-row w-full p-4">
+          <View className="flex-row w-full p-4 mt-6">
             <View className="flex-1 mr-2">
               <CustomButton
                 title="  Logout"
                 IconLeft={() => (
                   <AntDesign name="logout" size={20} color="white" />
                 )}
-                onPress={() => {}}
+                onPress={() => {
+                  logout();
+                }}
               />
             </View>
-            <View className="flex-1 ml-2">
+            {/* <View className="flex-1 ml-2">
               <CustomButton
                 bgVariant="secondary"
                 title="  Language"
@@ -200,7 +217,7 @@ const Profile = () => {
                 )}
                 onPress={() => {}}
               />
-        </View>
+        </View> */}
       </View>
       </ScrollView>
     </SafeAreaView>

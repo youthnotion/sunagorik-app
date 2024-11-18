@@ -94,6 +94,8 @@ const ReportDetailScreen = () => {
     );
   };
 
+  console.log(profile);
+
   return (
     <>
       <ScrollView
@@ -112,10 +114,12 @@ const ReportDetailScreen = () => {
 
           <View className="mb-4 flex-row items-center">
             <View className="w-12 h-12 rounded-full border-2 border-sunagorik p-[2px]">
-              <Image
-                source={{
-                  uri: "https://flmuyyvdnvexbgkqehth.supabase.co/storage/v1/object/public/avatars/a65c1a16-deb7-45a2-a6bd-27fd9b1caeb3/avatar.jpg",
-                }}
+            <Image
+              source={
+                getImageUrl("avatars", profile?.avatar_url)
+                  ? { uri: getImageUrl("avatars", profile?.avatar_url) }
+                  : require("@/assets/images/avatar.png")
+              }
                 className="w-full h-full rounded-full"
               />
             </View>

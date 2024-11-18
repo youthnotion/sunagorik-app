@@ -30,7 +30,7 @@ export const usePostList = (filters?: FilterParams) => {
   return useInfiniteQuery({
     queryKey: ["posts", filters],
     queryFn: async ({ pageParam = 0 }) => {
-      const defaultLimit = 5; // Changed to 5 to match your logs
+      const defaultLimit = 5;
       const from = pageParam * defaultLimit;
       const to = from + defaultLimit - 1;
 
@@ -254,7 +254,25 @@ export const usePostsInView = (region: {
 
       return posts_in_view ?? [];
     },
-    staleTime: 1000 * 60 * 5, // Data considered fresh for 5 minutes
+    staleTime: 1000 * 60 * 30, // Data considered fresh for 30 minutes
     gcTime: 1000 * 60 * 30,
+  });
+};
+
+export const useUserReportStats = (userId: string) => {
+  return useQuery({
+    queryKey: ["user-report-stats", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc('get_user_report_stats', {
+          user_id: userId
+        });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
+    }
   });
 };

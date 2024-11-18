@@ -9,6 +9,10 @@ import * as Yup from 'yup';
 import ErrorMessage from "@/components/ErrorMessage";
 import CustomButton from "@/components/CustomButton";
 import { neighborhoods } from "@/constants";
+import NeighborhoodDropdown from "@/components/NeighborhoodDropdown";
+import InputField from "@/components/InputField";
+import { FontAwesome } from "@expo/vector-icons";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const validationSchema = Yup.object().shape({
   title: Yup.string()
@@ -42,94 +46,49 @@ export default function FormBody() {
 
   const handleSubmit = (values: typeof initialValues) => {
     updateFormData(values);
-    router.push("/(form)/image");
+    router.push("/(form)/details");
   };
 
   return (
-    <SafeAreaView className="flex-1 p-2">
+    <SafeAreaView className="flex-1 px-4">
+    <View className="items-center">
+        <View className="bg-gray-100 rounded-full">
+        <MaterialIcons name="post-add" size={80} color="#CF322C" />
+        </View>
+      </View>      
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ handleChange, handleSubmit, values, errors, touched, setFieldTouched, setFieldValue }) => (
-          <ScrollView>
+          <ScrollView showsVerticalScrollIndicator={false}>
             {/* Title Input */}
-            <View className="mb-4">
-              <Text className="text-gray-700 text-base mb-2 font-medium">Title</Text>
-              <TextInput
+            <View className="mb-2">
+              <InputField
+                label="Title"
                 value={values.title}
                 onChangeText={handleChange('title')}
                 placeholder="Write a caption for your post"
                 onBlur={() => setFieldTouched('title')}
-                className={`w-full bg-white p-4 rounded-lg border border-gray-200 focus:border-sunagorik`}
               />
               <ErrorMessage error={errors.title} visible={touched.title} />
             </View>
 
             {/* Neighborhood Input */}
-            <View className="mb-4">
-              <Text className="text-gray-700 text-base mb-2 font-medium">Neighborhood</Text>
-              <View className="relative">
-                <TextInput
-                  value={values.neighborhood}
-                  onChangeText={(text) => {
-                    setSearchQuery(text);
-                    setFieldValue('neighborhood', text);
-                    setShowDropdown(true);
-                  }}
-                  onFocus={() => setShowDropdown(true)}
-                  placeholder="Start typing the name of your area"
-                  onBlur={() => {
-                    setFieldTouched('neighborhood');
-                    setTimeout(() => setShowDropdown(false), 200);
-                  }}
-                  className={`w-full bg-white p-4 rounded-lg border border-gray-200 focus:border-sunagorik`}
-                />
-                
-                {/* Dropdown List */}
-                {showDropdown && filteredNeighborhoods.length > 0 && (
-                  <View className="absolute top-full left-0 right-0 z-50 mt-1 bg-white rounded-lg border border-gray-200 shadow-lg max-h-48">
-                    <ScrollView 
-                      keyboardShouldPersistTaps="handled"
-                      nestedScrollEnabled={true}
-                    >
-                      {filteredNeighborhoods.map((item) => (
-                        <TouchableOpacity
-                          key={item.id}
-                          className="p-4 border-b border-gray-100"
-                          onPress={() => {
-                            setFieldValue('neighborhood', item.en);
-                            setSearchQuery(item.en);
-                            setShowDropdown(false);
-                          }}
-                        >
-                          <Text>{item.en}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  </View>
-                )}
-              </View>
-              <ErrorMessage error={errors.neighborhood} visible={touched.neighborhood} />
-            </View>
-
-            {/* Details Input */}
-            <View className="mb-4">
-              <Text className="text-gray-700 text-base mb-2 font-medium">Details</Text>
-              <TextInput
-                value={values.description}
-                onChangeText={handleChange('description')}
-                placeholder="Enter details (optional)"
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-                className="w-full bg-white p-4 rounded-lg border border-gray-200 h-32 focus:border-sunagorik"
+            <View className="mb-2">
+              <NeighborhoodDropdown
+                value={values.neighborhood}
+                onChangeValue={(value) => setFieldValue('neighborhood', value)}
+                error={errors.neighborhood}
+                touched={touched.neighborhood}
+                onBlur={() => setFieldTouched('neighborhood')}
               />
             </View>
 
             {/* Severity */}
-            <Text className="text-gray-700 text-base mb-2 font-medium">Severity</Text>
+            <Text className="text-black text-lg mb-2 font-medium">Severity</Text>
             <View className="justify-center items-center bg-white p-8 rounded-lg border border-gray-200">
               <StarRating 
                 rating={values.severity}
@@ -140,7 +99,7 @@ export default function FormBody() {
             <ErrorMessage error={errors.severity} visible={touched.severity} />
 
             {/* Submit Button */}
-            <CustomButton title="Next" onPress={handleSubmit} className="mt-6" />
+            <CustomButton title="Next" onPress={handleSubmit} className="mt-4" />
           </ScrollView>
         )}
       </Formik>

@@ -152,9 +152,9 @@ export default function ImageUpload() {
 
   return (
     <SafeAreaView className="flex-1 p-2">
-      <View className="flex-1">
+      <View className="flex-1 justify-center">
         {/* Image Preview */}
-        <View className="flex items-center justify-center">
+        <View className="flex items-center justify-center mb-8">
           {image ? (
             <View className="h-64 w-64 items-center justify-center mb-16">
               <Image
