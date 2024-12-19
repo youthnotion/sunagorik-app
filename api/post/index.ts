@@ -97,7 +97,8 @@ export const usePost = (id: number) => {
           *,
           reporter:reported_by (
             full_name,
-            avatar_url
+            avatar_url,
+            citizen_score
           )
         `
         )

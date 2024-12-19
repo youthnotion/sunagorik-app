@@ -116,8 +116,8 @@ const ReportDetailScreen = () => {
             <View className="w-12 h-12 rounded-full border-2 border-sunagorik p-[2px]">
             <Image
               source={
-                getImageUrl("avatars", profile?.avatar_url)
-                  ? { uri: getImageUrl("avatars", profile?.avatar_url) }
+                getImageUrl("avatars", report.reporter.avatar_url)
+                  ? { uri: getImageUrl("avatars", report.reporter.avatar_url) }
                   : require("@/assets/images/avatar.png")
               }
                 className="w-full h-full rounded-full"
@@ -127,10 +127,10 @@ const ReportDetailScreen = () => {
               <Text className="text-sm font-JakartaMedium">
                 {report.reporter.full_name}
               </Text>
-              <View className="flex-row items-center">
+              <View className="flex-row items-center gap-x-2">
                 <FontAwesome name="star" size={14} color="#CF322C" />
-                <Text className="text-sm font-JakartaMedium ml-1">
-                  {report.reporter.rating}
+                <Text className="text-xs font-JakartaMedium ml-1">
+                  {report.reporter.citizen_score}
                 </Text>
               </View>
             </View>
