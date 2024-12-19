@@ -7,15 +7,15 @@ const Layout = () => {
       <Stack>
         <Stack.Screen
           name="body"
-          options={{ title: "Profile", headerShown: true }}
+          options={{ title: "Profile", headerShown: false }}
         />
         <Stack.Screen
           name="about"
-          options={{ title: "About", headerShown: true }}
+          options={{ title: "About", headerShown: false }}
         />
         <Stack.Screen
           name="avatar"
-          options={{ title: "Avatar", headerShown: true }}
+          options={{ title: "Avatar", headerShown: false }}
         />
       </Stack>
     </FormProvider>

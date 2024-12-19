@@ -1,14 +1,18 @@
+import { useUpdateProfile } from "@/api/profile";
+import CustomButton from "@/components/CustomButton";
+import ErrorMessage from "@/components/ErrorMessage";
+import InputField from "@/components/InputField";
+import NeighborhoodDropdown from "@/components/NeighborhoodDropdown";
+import ProfileProgress from "@/components/ProfileProgress";
+import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useFormik } from "formik";
-import * as Yup from "yup";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { useState } from "react";
+import { ScrollView, View, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useFormContext } from "../../../providers/ProfileFormProvider";
-import NeighborhoodDropdown from "@/components/NeighborhoodDropdown";
-import CustomButton from "@/components/CustomButton";
-import InputField from "@/components/InputField";
-import ErrorMessage from "@/components/ErrorMessage";
-import { FontAwesome } from "@expo/vector-icons";
+import * as Yup from "yup";
+import { ProfileData, useFormContext } from "../../../providers/ProfileFormProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 const validationSchema = Yup.object().shape({
   about: Yup.string()
@@ -18,8 +22,11 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function FormBody() {
-  const { formData, updateProfileData } = useFormContext();
+  const { formData, updateProfileData, resetProfile } = useFormContext();
   const router = useRouter();
+  const { profile } = useAuth();
+  const [isNeighborhoodValid, setIsNeighborhoodValid] = useState(true);
+  const { mutate: updateProfile } = useUpdateProfile();
 
   const formik = useFormik({
     initialValues: {
@@ -27,22 +34,70 @@ export default function FormBody() {
       neighborhood: formData.neighborhood || "",
     },
     validationSchema,
-    onSubmit: (values) => {
-      updateProfileData(values);
-      router.push("/(form)/(profile)/avatar");
+    onSubmit: async (values) => {
+      await updateProfileData(values);
+      handleSubmission();
     },
   });
 
+  const handleSubmission = () => {
+    let avatarPath;
+    const randomIndex = Math.floor(Math.random() * 5);
+
+    if (formData.gender === "male") {
+      avatarPath = `random/M${randomIndex + 1}`;
+    } else {
+      avatarPath = `random/F${randomIndex + 1}`;
+    }
+
+    const profileData: ProfileData = {
+      id: profile.id,
+      username: formData.username,
+      fullName: formData.fullName,
+      gender: formData.gender,
+      avatar: avatarPath,
+      about: formData.about,
+      neighborhood: formData.neighborhood,
+    };
+
+    updateProfile(profileData, {
+      onSuccess: (data) => {
+        Alert.alert(
+          "Success!",
+          "Your profile has been updated successfully.",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                resetProfile();
+                router.replace("/(root)/(tabs)/home");
+              },
+            },
+          ]
+        );
+      },
+      onError: (error) => {
+        console.error("Update failed:", error);
+        Alert.alert(
+          "Error",
+          "Failed to update profile. Please try again. Error: " + error.message,
+          [{ text: "OK" }]
+        );
+      },
+    });
+  };
+
   return (
-    <SafeAreaView className="flex-1 px-4">
+    <SafeAreaView className="flex-1 p-4 bg-white">
       <ScrollView showsVerticalScrollIndicator={false}>
-      <View className="items-center mb-2">
+      <ProfileProgress currentStep={2} totalSteps={2} />
+      <View className="items-center mt-12 mb-8">
           <View className="bg-gray-100 p-6 rounded-full">
             <FontAwesome name="user-circle-o" size={80} color="#CF322C" />
           </View>
         </View>
 
-        <View className="mb-2">
+        <View>
           <NeighborhoodDropdown
             value={formik.values.neighborhood}
             onChangeValue={(value) =>
@@ -51,6 +106,7 @@ export default function FormBody() {
             error={formik.errors.neighborhood}
             touched={formik.touched.neighborhood}
             onBlur={() => formik.setFieldTouched("neighborhood")}
+            onValidationChange={setIsNeighborhoodValid}
           />
         </View>
 
@@ -64,7 +120,7 @@ export default function FormBody() {
             multiline
             numberOfLines={4}
             textAlignVertical="top"
-            className="h-36"
+            inputStyle="h-32"
           />
           <ErrorMessage
             error={formik.errors.about}
@@ -73,12 +129,12 @@ export default function FormBody() {
         </View>
 
         <CustomButton
-          title="Next"
+          title="Submit"
           onPress={formik.handleSubmit}
-          disabled={!formik.isValid || !formik.dirty}
-          className={`mt-4 ${
-            formik.isValid && formik.dirty ? "bg-sunagorik" : "bg-gray-300"
-          }`}
+          disabled={!formik.isValid || !formik.dirty || !isNeighborhoodValid}
+          className={`mt-8 ${
+            formik.isValid && formik.dirty && isNeighborhoodValid ? "bg-sunagorik" : "bg-gray-300"
+          } p-4 rounded-lg`}
         />
       </ScrollView>
     </SafeAreaView>

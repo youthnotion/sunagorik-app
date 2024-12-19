@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { neighborhoods } from "@/constants";
 import ErrorMessage from "./ErrorMessage";
@@ -10,6 +10,7 @@ interface NeighborhoodDropdownProps {
   error?: string;
   touched?: boolean;
   onBlur?: () => void;
+  onValidationChange?: (isValid: boolean) => void;
 }
 
 export default function NeighborhoodDropdown({
@@ -17,14 +18,32 @@ export default function NeighborhoodDropdown({
   onChangeValue,
   error,
   touched,
-  onBlur
+  onBlur,
+  onValidationChange
 }: NeighborhoodDropdownProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [customError, setCustomError] = useState<string | undefined>();
 
   const filteredNeighborhoods = neighborhoods.filter(n => 
     n.en.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const validateNeighborhood = (text: string) => {
+    const isValid = !text || neighborhoods.some(n => n.en.toLowerCase() === text.toLowerCase());
+    if (!isValid && text) {
+      setCustomError("Please select a neighborhood from the list");
+    } else {
+      setCustomError(undefined);
+    }
+    onValidationChange?.(isValid);
+    return isValid;
+  };
+
+  // Validate initial value
+  useEffect(() => {
+    validateNeighborhood(value);
+  }, [value]);
 
   return (
     <View className="">
@@ -36,10 +55,12 @@ export default function NeighborhoodDropdown({
             setSearchQuery(text);
             onChangeValue(text);
             setShowDropdown(true);
+            validateNeighborhood(text);
           }}
           onFocus={() => setShowDropdown(true)}
           placeholder="Start typing the name of your area"
           onBlur={() => {
+            validateNeighborhood(value);
             onBlur?.();
             setTimeout(() => setShowDropdown(false), 200);
           }}
@@ -59,6 +80,8 @@ export default function NeighborhoodDropdown({
                   onPress={() => {
                     onChangeValue(item.en);
                     setSearchQuery(item.en);
+                    setCustomError(undefined);
+                    onValidationChange?.(true);
                     setShowDropdown(false);
                   }}
                 >
@@ -69,7 +92,7 @@ export default function NeighborhoodDropdown({
           </View>
         )}
       </View>
-      <ErrorMessage error={error} visible={touched} />
+      <ErrorMessage error={customError || error} visible={touched || !!customError} />
     </View>
   );
 }

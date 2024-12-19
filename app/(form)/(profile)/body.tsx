@@ -11,6 +11,8 @@ import ErrorMessage from "@/components/ErrorMessage";
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import debounce from 'lodash/debounce';
+import ProfileProgress from "@/components/ProfileProgress";
+import GenderSelect from "@/components/GenderSelect";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string()
@@ -20,6 +22,9 @@ const validationSchema = Yup.object().shape({
   fullName: Yup.string()
     .required('Full name is required')
     .min(10, 'Full name must be at least 10 characters long'),
+  gender: Yup.string()
+    .required('Please select your gender')
+    .oneOf(['male', 'female', 'other'], 'Invalid gender selection'),
 });
 
 export default function FormBody() {
@@ -68,12 +73,21 @@ export default function FormBody() {
     initialValues: {
       username: formData.username || '',
       fullName: formData.fullName || '',
+      gender: formData.gender || '',
     },
     validationSchema,
-    onSubmit: (values) => {
-      if (usernameError) return;
-      updateProfileData(values);
-      router.push("/(form)/(profile)/about");
+    validateOnChange: true,
+    validateOnBlur: true,
+    onSubmit: async (values) => {
+      try {
+        const isValid = await formik.validateForm();
+        if (Object.keys(isValid).length === 0) {
+          await updateProfileData(values);
+          router.push("/(form)/(profile)/about");
+        }
+      } catch (error) {
+        console.error('Validation error:', error);
+      }
     },
   });
 
@@ -87,9 +101,10 @@ export default function FormBody() {
   };
 
   return (
-    <SafeAreaView className="flex-1 p-4">
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="items-center mb-2">
+    <SafeAreaView className="flex-1 p-4 bg-white">
+      <ScrollView className="flex-1">
+      <ProfileProgress currentStep={1} totalSteps={2} />
+        <View className="items-center mt-12 mb-8">
           <View className="bg-gray-100 p-6 rounded-full">
             <FontAwesome name="user-circle-o" size={80} color="#CF322C" />
           </View>
@@ -120,12 +135,21 @@ export default function FormBody() {
           <ErrorMessage error={formik.errors.fullName} visible={formik.touched.fullName} />
         </View>
 
+        <View className="mb-4">
+            <GenderSelect
+              value={formik.values.gender}
+              onChangeValue={(value) => {
+                formik.setFieldValue('gender', value);
+              }}
+            />
+          </View>
+
         <CustomButton
           title="Next"
           onPress={formik.handleSubmit}
-          disabled={!formik.isValid || !formik.dirty || isCheckingUsername || !!usernameError || Object.keys(formik.errors).length > 0}
+          disabled={!formik.values.username || !formik.values.fullName || !formik.values.gender || isCheckingUsername || !!usernameError}
           className={`mt-8 p-4 rounded-lg ${
-            formik.isValid && formik.dirty && !isCheckingUsername && !usernameError ? "bg-sunagorik" : "bg-gray-300"
+            formik.values.username && formik.values.fullName && formik.values.gender && !isCheckingUsername && !usernameError ? "bg-sunagorik" : "bg-gray-300"
           }`}
         />
       </ScrollView>

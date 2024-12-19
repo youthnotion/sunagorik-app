@@ -1,8 +1,10 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-interface ProfileData {
+export interface ProfileData {
+  id?: string;
   username: string;
   fullName: string;
+  gender: string;
   avatar: any;
   about: string;
   neighborhood: string;
@@ -10,7 +12,7 @@ interface ProfileData {
 
 interface FormContextType {
   formData: ProfileData;
-  updateProfileData: (data: Partial<ProfileData>) => void;
+  updateProfileData: (data: Partial<ProfileData>) => Promise<void>;
   resetProfile: () => void;
 }
 
@@ -20,19 +22,27 @@ export function FormProvider({ children }: { children: ReactNode }) {
   const [formData, setFormData] = useState<ProfileData>({
     username: "",
     fullName: "",
+    gender: "",
     avatar: null,
     about: "",
     neighborhood: "",
   });
 
   const updateProfileData = (data: Partial<ProfileData>) => {
-    setFormData(prev => ({ ...prev, ...data }));
+    return new Promise<void>((resolve) => {
+      setFormData(prev => {
+        const newData = { ...prev, ...data };
+        resolve();
+        return newData;
+      });
+    });
   };
 
   const resetProfile = () => {
     setFormData({
       username: "",
       fullName: "",
+      gender: "",
       avatar: null,
       about: "",
       neighborhood: "",

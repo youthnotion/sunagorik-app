@@ -1,20 +1,12 @@
 import { supabase } from "@/lib/supabase";
+import { ProfileData } from "@/providers/ProfileFormProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-interface ProfileUpdateData {
-  id: string;
-  username?: string;
-  fullName?: string;
-  avatar?: string;
-  about?: string;
-  neighborhood?: string;
-}
 
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    async mutationFn(data: ProfileUpdateData) {
+    async mutationFn(data: ProfileData) {
       console.log('Updating profile with data:', data);
       
       const { error, data: updatedProfile } = await supabase
@@ -22,6 +14,7 @@ export const useUpdateProfile = () => {
         .update({
           username: data.username,
           full_name: data.fullName,
+          gender: data.gender,
           avatar_url: data.avatar,
           about: data.about,
           neighborhood: data.neighborhood,
