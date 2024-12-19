@@ -5,26 +5,23 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "com.sunagorik",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#cf322c"
-    },
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBmxPIl0k0S9IQW2y1Do7bBSnPq_YC_S6w"
+        }
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#cf322c"
       },
-      "package": "com.sunagorik.sunagorik",
-      "permissions": [],
-      "versionCode": 1,
-      "enableHermes": true,
-      "softwareKeyboardLayoutMode": "pan"
+      "package": "com.sunagorik.Sunagorik"
     },
     "web": {
       "bundler": "metro",
@@ -33,6 +30,15 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/adaptive-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#cf322c"
+        }
+      ],
       "expo-secure-store"
     ],
     "experiments": {
@@ -46,13 +52,11 @@
         "projectId": "cac597bf-6acc-42bd-b9e3-267ddca451ab"
       }
     },
-    "updates": {
-      "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/cac597bf-6acc-42bd-b9e3-267ddca451ab"
-    },
     "runtimeVersion": {
-      "policy": "sdkVersion"
+      "policy": "appVersion"
     },
-    "sdkVersion": "49.0.0"
+    "updates": {
+      "url": "https://u.expo.dev/cac597bf-6acc-42bd-b9e3-267ddca451ab"
+    }
   }
 }

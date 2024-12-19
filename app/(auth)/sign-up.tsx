@@ -6,16 +6,20 @@ import { icons, images } from "@/constants";
 import { Link, router } from "expo-router";
 import { Formik } from "formik";
 import React from "react";
-import { Alert, Image, ScrollView, Text, View } from "react-native";
+import { Alert, Image, Pressable, ScrollView, Text, View, StatusBar } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Yup from 'yup';
 import { supabase } from "@/lib/supabase";
 import { useState } from "react";
 import ActivityIndicator from "@/components/ActivityIndicator";
 
 const validationSchema = Yup.object().shape({
-  // name: Yup.string().required('Name is required').min(3, 'Name must be at least 3 characters'),
   email: Yup.string().email('Invalid email').required('Email is required'),
-  password: Yup.string().required('Password is required').min(8, 'Password must be at least 8 characters').matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, 'Password must contain at least 8 characters, 1 letter, and 1 number'),
+  password: Yup.string()
+    .required('Password is required')
+    .min(8, 'Password must be at least 8 characters')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number')
+    .matches(/^[A-Za-z0-9!@#$%^&*(),.?_\-+=]*$/, 'Invalid special character. Only ! @ # $ % ^ & * ( ) , . ? _ - + = are allowed'),
 });
 
 const SignUp = () => {
@@ -31,16 +35,16 @@ const SignUp = () => {
 
       if (error) {
         Alert.alert('Error', error.message);
+        return;
       }
-      else if (data) {
-        Alert.alert('Success', 'Account created successfully', [{ 
-          text: 'OK', 
-          onPress: () => {
-            router.replace('/(auth)/sign-in');
-          } 
-        }]);
-        console.log(data);
-      }
+
+      Alert.alert('Success', 'Account created successfully. Please check your email to verify your account', [{ 
+        text: 'OK', 
+        onPress: () => {
+          router.replace('/(auth)/sign-in');
+        } 
+      }]);
+      
     } catch (error) {
       Alert.alert('Error', 'An unexpected error occurred');
     } finally {
@@ -48,74 +52,77 @@ const SignUp = () => {
     }
   };
 
-  if (isLoading) {
-    return <ActivityIndicator visible={isLoading} />;
-  }
-
   return (
-    <ScrollView className="flex-1 bg-white">
-      <View className="flex-1 bg-white">
-        <View className="relative w-full h-[250px]">
-          <Image source={images.signup} className="z-0 w-full h-[250px]" />
-          <View className="absolute bottom-5 left-5">
-            <View className=" bg-gray-100/70 px-4 py-2 rounded-lg">
-              <Text className="text-2xl text-black font-JakartaSemiBold">
-                Create Your Account
-              </Text>
+    <>
+      <StatusBar translucent backgroundColor="white" barStyle="dark-content" />
+      {isLoading && <ActivityIndicator visible={isLoading} />}
+      <SafeAreaView className="flex-1 bg-white">
+        <ScrollView className="flex-1" pointerEvents={isLoading ? "none" : "auto"}>
+          <View className="flex-1 bg-white">
+            <View className="relative w-full h-[250px]">
+              <Image source={images.signup} className="z-0 w-full h-[250px]" />
+              <View className="absolute bottom-5 left-5">
+                <View className=" bg-gray-100/70 px-4 py-2 rounded-lg">
+                  <Text className="text-2xl text-black font-JakartaSemiBold">
+                    Create Your Account
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View className="p-5">
+              <Formik
+                initialValues={{ email: "", password: "" }}
+                validationSchema={validationSchema}
+                onSubmit={onSignUpPress}
+              >
+                {({ handleChange, handleSubmit, values, errors, touched, setFieldTouched, isValid, dirty }) => (
+                  <>
+                    <InputField
+                      label="Email"
+                      placeholder="Enter your email"
+                      icon={icons.email}
+                      value={values.email}
+                      onChangeText={handleChange('email')}
+                      onBlur={() => setFieldTouched('email')}
+                    />
+                    <ErrorMessage error={errors.email} visible={touched.email} />
+
+                    <InputField
+                      label="Password"
+                      placeholder="Enter your password"
+                      icon={icons.lock}
+                      secureTextEntry={true}
+                      value={values.password}
+                      onChangeText={handleChange('password')}
+                      onBlur={() => setFieldTouched('password')}
+                    />
+                    <ErrorMessage error={errors.password} visible={touched.password} />
+                    <CustomButton
+                      title="Sign Up"
+                      bgVariant={(!isValid || !dirty) ? "secondary" : "primary"}
+                      onPress={handleSubmit}
+                      className="mt-6"
+                      disabled={!isValid || !dirty}
+                    />
+                  </>
+                )}
+              </Formik>
+
+              <OAuth />
+
+              <Pressable
+                onPress={() => router.replace("/sign-in")}
+                className="flex-row justify-center items-center mt-10"
+              >
+                <Text className="text-md text-general-200">Already have an account? </Text>
+                <Text className="text-md text-sunagorik">Sign In</Text>
+              </Pressable>
             </View>
           </View>
-        </View>
-
-        <View className="p-5">
-          <Formik
-            initialValues={{ name: "", email: "", password: "" }}
-            validationSchema={validationSchema}
-            onSubmit={onSignUpPress}
-          >
-            {({ handleChange, handleSubmit, values, errors, touched, setFieldTouched }) => (
-              <>
-
-                <InputField
-                  label="Email"
-                  placeholder="Enter your email"
-                  icon={icons.email}
-                  value={values.email}
-                  onChangeText={handleChange('email')}
-                  onBlur={() => setFieldTouched('email')}
-                />
-                <ErrorMessage error={errors.email} visible={touched.email} />
-
-                <InputField
-                  label="Password"
-                  placeholder="Enter your password"
-                  icon={icons.lock}
-                  secureTextEntry={true}
-                  value={values.password}
-                  onChangeText={handleChange('password')}
-                  onBlur={() => setFieldTouched('password')}
-                />
-                <ErrorMessage error={errors.password} visible={touched.password} />
-                <CustomButton
-                  title="Sign Up"
-                  onPress={handleSubmit}
-                  className="mt-6"
-                />
-              </>
-            )}
-          </Formik>
-
-          <OAuth />
-
-          <Link
-            href="/sign-in"
-            className="text-md text-center text-general-200 mt-10"
-          >
-            <Text>Already have an account? </Text>
-            <Text className="text-sunagorik">Sign In</Text>
-          </Link>
-        </View>
-      </View>
-    </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
+    </>
   );
 };
 

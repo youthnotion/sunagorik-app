@@ -46,7 +46,7 @@ export default function FormBody() {
 
   const handleSubmit = (values: typeof initialValues) => {
     updateFormData(values);
-    router.push("/(form)/details");
+    router.push("/(form)/(post)/details");
   };
 
   return (

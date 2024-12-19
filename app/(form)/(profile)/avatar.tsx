@@ -123,7 +123,7 @@ export default function ImageUpload() {
                   text: "OK",
                   onPress: () => {
                     updateProfileData({});
-                    router.replace("/(tabs)/home");
+                    router.replace("/(root)/(tabs)/home");
                   },
                 },
               ]

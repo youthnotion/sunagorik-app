@@ -96,7 +96,7 @@ export default function ImageUpload() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
-      quality: 0.5,
+      quality: 0.3,
     });
 
     if (!result.canceled) {
@@ -159,7 +159,7 @@ export default function ImageUpload() {
                   text: "OK",
                   onPress: () => {
                     updateFormData({});
-                    router.replace("/(tabs)/feed");
+                    router.replace("/(root)/(tabs)/feed");
                   },
                 },
               ]

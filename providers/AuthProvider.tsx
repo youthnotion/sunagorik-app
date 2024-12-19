@@ -15,6 +15,17 @@ type AuthData = {
   loading: boolean;
 };
 
+interface Profile {
+  id: string;
+  username: string;
+  full_name: string;
+  about: string;
+  avatar_url: string;
+  neighborhood: string;
+  role: string;
+  updated_at: Date;
+}
+
 const AuthContext = createContext<AuthData>({
   session: null,
   profile: null,
@@ -24,7 +35,7 @@ const AuthContext = createContext<AuthData>({
 
 export default function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,6 +59,8 @@ export default function AuthProvider({ children }: PropsWithChildren) {
       }
       setLoading(false)
     };
+    console.log(session);
+    console.log(profile);
     
     fetchSession();
 

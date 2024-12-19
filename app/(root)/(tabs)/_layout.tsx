@@ -3,11 +3,11 @@ import { Tabs } from "expo-router";
 import { Image, ImageSourcePropType, View } from "react-native";
 
 const TabIcon = ({
-  source,
   focused,
+  source,
 }: {
-  source: ImageSourcePropType;
   focused: boolean;
+  source: ImageSourcePropType;
 }) => (
   <View
     className={`flex flex-row justify-center items-center rounded-full ${
@@ -31,27 +31,45 @@ const TabIcon = ({
 
 const Layout = () => (
   <Tabs
-    initialRouteName="index"
+    initialRouteName="home"
     screenOptions={{
+      headerShown: false,
       tabBarActiveTintColor: "white",
       tabBarInactiveTintColor: "white",
       tabBarShowLabel: false,
       tabBarStyle: {
         backgroundColor: "#d6d4d4",
-        borderRadius: 20,
+        borderRadius: 25,
+        marginHorizontal: 30,
+        marginBottom: 28,
+        height: 75,
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 0,
+        elevation: 4,
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 4,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
         borderWidth: 1,
         borderColor: "#CF322C",
         borderTopWidth: 1,
         borderTopColor: "#CF322C",
-        paddingBottom: 0,
-        marginHorizontal: 30,
-        marginBottom: 30,
-        height: 72,
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexDirection: "row",
-        position: "absolute",
+      },
+      tabBarItemStyle: {
+        height: 75,
+        padding: 0,
+        margin: 0,
+      },
+      tabBarIconStyle: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
       },
     }}
   >

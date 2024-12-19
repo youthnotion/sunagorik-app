@@ -23,7 +23,7 @@ export default function DetailsScreen() {
 
   const handleSubmit = (values: typeof initialValues) => {
     updateFormData(values);
-    router.push("/(form)/image");
+    router.push("/(form)/(post)/image");
   };
 
   return (

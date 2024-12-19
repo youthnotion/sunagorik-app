@@ -16,12 +16,12 @@ const Home = () => {
   }
 
   // If we have a session but no profile, they need to complete profile setup
-  if (session && !profile) {
+  if (session && profile.username === null) {
     return <Redirect href="/(form)/(profile)/body" />;
   }
 
   // If we have both session and profile, go to main app
-  if (session && profile) {
+  if (session && profile.username) {
     return <Redirect href="/(root)/(tabs)/home" />;
   }
 

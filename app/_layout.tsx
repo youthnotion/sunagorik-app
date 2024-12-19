@@ -6,7 +6,9 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AuthProvider from "@/providers/AuthProvider";
 import "react-native-reanimated";
+// import "../global.css";
 import OfflineNotice from "@/components/OfflineNotice";
+import { StatusBar } from "react-native";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -38,6 +40,7 @@ export default function RootLayout() {
     <GestureHandlerRootView>
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
+          <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
           <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="(root)" options={{ headerShown: false }} />

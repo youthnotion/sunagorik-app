@@ -89,7 +89,7 @@ const Profile = () => {
               />
             </View>
             <View className="ml-2">
-              <Text className="text-4xl font-bold text-sunagorik">{userReportStats?.resolved}</Text>
+              <Text className="text-4xl font-bold text-sunagorik">{userReportStats?.resolved || 0}</Text>
               <Text className="text-sm text-gray-600">Resolved</Text>
             </View>
           </View>
@@ -108,7 +108,7 @@ const Profile = () => {
               />
             </View>
             <View className="ml-2">
-              <Text className="text-4xl font-bold text-sunagorik">{userReportStats?.in_progress}</Text>
+              <Text className="text-4xl font-bold text-sunagorik">{userReportStats?.in_progress || 0}</Text>
               <Text className="text-sm text-gray-600">In Progress</Text>
             </View>
           </View>
@@ -124,7 +124,7 @@ const Profile = () => {
             </View>
             <View className="ml-2">
               <Text className="text-4xl font-bold text-sunagorik">
-                {profile?.citizen_score}
+                {(userReportStats?.total || 0) + ((userReportStats?.resolved || 0) * 10) + ((userReportStats?.in_progress || 0) * 5)}
               </Text>
               <Text className="text-sm text-gray-600">Citizen Score</Text>
             </View>
