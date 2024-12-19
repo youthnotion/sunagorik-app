@@ -19,6 +19,7 @@ interface Profile {
   id: string;
   username: string;
   full_name: string;
+  gender: string;
   about: string;
   avatar_url: string;
   neighborhood: string;

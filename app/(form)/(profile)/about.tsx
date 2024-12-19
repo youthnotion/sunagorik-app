@@ -45,9 +45,9 @@ export default function FormBody() {
     const randomIndex = Math.floor(Math.random() * 5);
 
     if (formData.gender === "male") {
-      avatarPath = `random/M${randomIndex + 1}`;
+      avatarPath = `random/M${randomIndex + 1}.png`;
     } else {
-      avatarPath = `random/F${randomIndex + 1}`;
+      avatarPath = `random/F${randomIndex + 1}.png`;
     }
 
     const profileData: ProfileData = {

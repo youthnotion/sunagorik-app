@@ -32,7 +32,7 @@ const Profile = () => {
       {/* Profile Card */}
       <View className="bg-sunagorik m-4 p-4 rounded-xl shadow-sm">
         <View className="flex-row items-center mb-4">
-          <View className="w-20 h-20 rounded-full border-2 border-gray-200 p-[2px]">
+          <View className="w-20 h-20 rounded-full border-2 border-gray-200 bg-gray-200 p-[2px]">
             <Image
               source={
                 getImageUrl("avatars", profile?.avatar_url)
