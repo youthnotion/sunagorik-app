@@ -12,22 +12,24 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const Profile = () => {
   const { profile, refreshProfile } = useAuth();
-  const { data: userReportStats, isLoading, refetch } = useUserReportStats(profile?.id);
+  const { data: userReportStats, isLoading, refetch: refetchUserReportStats } = useUserReportStats(profile?.id);
   const [refreshing, setRefreshing] = useState(false);
-  const [forceReload, setForceReload] = useState(false);
+  const [timestamp, setTimestamp] = useState(Date.now());
 
   const onRefresh = async () => {
     setRefreshing(true);
-    setForceReload(true); // Trigger cache clear and reload
+    setTimestamp(Date.now()); // Update timestamp to force new image URL
     
-    await Promise.all([
-      refreshProfile(),
-      refetch(),
-    ]);
-    
-    setRefreshing(false);
-    // Reset force reload after a short delay to ensure image has started loading
-    setTimeout(() => setForceReload(false), 100);
+    try {
+      await Promise.all([
+        refreshProfile(),
+        refetchUserReportStats()
+      ]);
+    } catch (error) {
+      console.error("Error refreshing profile:", error);
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const logout = () => {
@@ -39,7 +41,9 @@ const Profile = () => {
     return <ActivityIndicator visible={true} />
   }
 
-  console.log(profile);
+  const imageUrl = profile?.avatar_url 
+    ? `${getImageUrl("avatars", profile.avatar_url)}?t=${timestamp}`
+    : null;
 
   return (
     <SafeAreaView>
@@ -63,14 +67,10 @@ const Profile = () => {
               <View className="w-20 h-20 rounded-full border-2 border-gray-200 bg-gray-200 p-[2px]">
                 <Image
                   source={
-                    getImageUrl("avatars", profile?.avatar_url)
+                    imageUrl
                       ? { 
-                          uri: getImageUrl("avatars", profile?.avatar_url),
-                          cache: forceReload ? 'force-cache' : 'reload',
-                          headers: {
-                            'Cache-Control': forceReload ? 'no-cache' : 'max-age=31536000',
-                            'Pragma': forceReload ? 'no-cache' : 'max-age=31536000'
-                          }
+                          uri: imageUrl,
+                          cache: 'reload'
                         }
                       : require("@/assets/images/avatar.png")
                   }
