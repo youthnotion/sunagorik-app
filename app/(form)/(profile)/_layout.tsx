@@ -15,7 +15,7 @@ const Layout = () => {
         />
         <Stack.Screen
           name="avatar"
-          options={{ title: "Avatar", headerShown: false }}
+          options={{ title: "Avatar", headerShown: true }}
         />
       </Stack>
     </FormProvider>

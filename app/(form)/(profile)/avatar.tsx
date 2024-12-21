@@ -6,19 +6,17 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useFormContext } from "../../../providers/ProfileFormProvider";
 
-import { useUpdateProfile } from "@/api/profile";
+import { useUpdateAvatar } from "@/api/profile";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/providers/AuthProvider";
 import { decode } from "base64-arraybuffer";
 import { Alert } from "react-native";
 
 export default function ImageUpload() {
-  const { formData, updateProfileData } = useFormContext();
   const router = useRouter();
-  const { profile } = useAuth();
-  const { mutate: updateProfile } = useUpdateProfile();
+  const { profile, refreshProfile } = useAuth();
+  const { mutate: updateAvatar } = useUpdateAvatar();
   const [image, setImage] = useState<string | null>(null);
 
   const getImageTypeFromBase64 = (base64String: string) => {
@@ -34,13 +32,8 @@ export default function ImageUpload() {
         encoding: "base64",
       });
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user");
-
       const imageType = getImageTypeFromBase64(base64Image);
-      const filePath = `${user.id}/avatar.${imageType}`;
+      const filePath = `${profile.id}/avatar.${imageType}`;
       const contentType = `image/${imageType}`;
 
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -63,7 +56,7 @@ export default function ImageUpload() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.5,
+      quality: 0.3,
     });
 
     if (!result.canceled) {
@@ -91,7 +84,7 @@ export default function ImageUpload() {
 
   const handleSubmission = async () => {
     if (image) {
-      try {
+    try {
         console.log('Starting upload...');
         const avatarPath = await uploadImage();
         
@@ -101,57 +94,56 @@ export default function ImageUpload() {
 
         console.log('Avatar uploaded, path:', avatarPath);
         
-        const updateData = {
-          id: profile.id,
-          username: formData.username,
-          fullName: formData.fullName,
-          avatar: avatarPath,
-          about: formData.about,
-          neighborhood: formData.neighborhood,
-        };
+      const updateData = {
+        id: profile.id,
+          avatarPath: avatarPath,
+      };
 
-        console.log('Updating profile with:', updateData);
+      console.log('Updating profile with:', updateData);
 
-        await updateProfile(updateData, {
-          onSuccess: (data) => {
-            console.log("Profile updated successfully:", data);
-            Alert.alert(
-              "Success!",
-              "Your profile has been updated successfully.",
-              [
-                {
-                  text: "OK",
-                  onPress: () => {
-                    updateProfileData({});
-                    router.replace("/(root)/(tabs)/home");
-                  },
+      await updateAvatar(updateData, {
+        onSuccess: async (data) => {
+          console.log("Avatar updated successfully:", data);
+          
+          // Refresh the profile after successful update
+          await refreshProfile();
+          
+          Alert.alert(
+            "Success!",
+            "Your avatar has been updated successfully.",
+            [
+              {
+                text: "OK",
+                onPress: () => {
+                  router.replace("/(root)/(tabs)/profile");
                 },
-              ]
-            );
-          },
-          onError: (error) => {
-            console.error("Update failed:", error);
-            Alert.alert(
-              "Error",
-              "Failed to update profile. Please try again.",
-              [{ text: "OK" }]
-            );
-          },
-        });
+              },
+            ]
+          );
+        },
+        onError: (error) => {
+          console.error("Update failed:", error);
+          Alert.alert(
+            "Error",
+            "Failed to update avatar. Please try again.",
+            [{ text: "OK" }]
+          );
+        },
+      });
 
-      } catch (error) {
-        console.error("Submission error:", error);
-        Alert.alert(
-          "Error",
-          "Failed to submit profile. Please try again.",
-          [{ text: "OK" }]
-        );
-      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      Alert.alert(
+        "Error",
+        "Failed to submit profile. Please try again.",
+        [{ text: "OK" }]
+      );
     }
   };
+}
 
   return (
-    <SafeAreaView className="flex-1 p-2">
+    <SafeAreaView className="flex-1 p-4">
       <View className="flex-1 justify-center">
         {/* Image Preview */}
         <View className="flex items-center justify-center mb-8">

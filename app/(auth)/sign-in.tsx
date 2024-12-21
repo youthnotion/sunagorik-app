@@ -128,6 +128,7 @@ const SignIn = () => {
                     <InputField
                       label="Email"
                       placeholder="Enter your email"
+                      keyboardType="email-address"
                       icon={icons.email}
                       value={values.email}
                       onChangeText={handleChange('email')}

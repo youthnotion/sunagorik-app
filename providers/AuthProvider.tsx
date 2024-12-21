@@ -13,6 +13,7 @@ type AuthData = {
   profile: any;
   role: string;
   loading: boolean;
+  refreshProfile: () => Promise<any>;
 };
 
 interface Profile {
@@ -32,12 +33,43 @@ const AuthContext = createContext<AuthData>({
   profile: null,
   role: "general",
   loading: true,
+  refreshProfile: async () => null,
 });
 
 export default function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data: profileData, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+      }
+
+      console.log('Fetched profile data:', profileData);
+      setProfile(profileData);
+      return profileData;
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      return null;
+    }
+  };
+
+  const refreshProfile = async () => {
+    if (!session?.user?.id) return null;
+      const profileData = await fetchProfile(session.user.id);
+      setProfile(profileData);
+      console.log(profileData);
+      return profileData;
+  };
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -89,7 +121,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 
   return (
     <AuthContext.Provider
-      value={{ session, profile, role: profile?.role || "general", loading }}
+      value={{ session, profile, role: profile?.role || "general", loading, refreshProfile }}
     >
       {children}
     </AuthContext.Provider>

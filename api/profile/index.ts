@@ -40,3 +40,37 @@ export const useUpdateProfile = () => {
     },
   });
 };
+
+export const useUpdateAvatar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    async mutationFn(data: {id: string, avatarPath: string}) {
+      console.log('Updating avatar with data:', data);
+      
+      const { error, data: updatedProfile } = await supabase
+        .from("profiles")
+        .update({
+          avatar_url: data.avatarPath,
+        })
+        .eq("id", data.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      return updatedProfile;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      console.log('Avatar updated successfully:', data);
+    },
+    onError: (error) => {
+      console.error('Mutation error:', error);
+    },
+  });
+};
+
