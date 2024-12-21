@@ -1,19 +1,53 @@
 import { FilterParams, usePostList } from "@/api/post/index";
 import ActivityIndicator from "@/components/ActivityIndicator";
-import { ActivityIndicator as RNActivityIndicator } from "react-native";
 import ReportCard from "@/components/ReportCard";
 import { images } from "@/constants";
 import { useAuth } from "@/providers/AuthProvider";
-import React, { useState, useCallback, memo } from "react";
+import React, { memo, useCallback, useMemo, useState } from "react";
 import {
   FlatList,
   Image,
   Pressable,
   Text,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const FILTER_OPTIONS = ["My Posts", "Pending", "In Progress", "Resolved", "Severe"];
+
+const usePostFilters = (userId?: string) => {
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+
+  const filterParams = useMemo<FilterParams>(() => {
+    const filters: FilterParams = {
+      limit: 5,
+    };
+
+    if (selectedFilters.includes("Severe")) {
+      filters.severity = true;
+    }
+    
+    if (selectedFilters.includes("My Posts") && userId) {
+      filters.user_id = userId;
+    }
+
+    const statusFilters = selectedFilters
+      .filter(status => !["Severe", "My Posts"].includes(status))
+      .map(status => status.toLowerCase());
+
+    if (statusFilters.length > 0) {
+      filters.status = statusFilters;
+    }
+
+    return filters;
+  }, [selectedFilters, userId]);
+
+  return {
+    selectedFilters,
+    setSelectedFilters,
+    filterParams
+  };
+};
 
 const MemoizedReportCard = memo(ReportCard);
 
@@ -31,38 +65,41 @@ const EmptyListComponent = memo(() => (
   </View>
 ));
 
+const FilterItem = memo(({ status, isSelected, onPress }: { 
+  status: string;
+  isSelected: boolean; 
+  onPress: () => void;
+}) => (
+  <Pressable
+    onPress={onPress}
+    className={`p-2 rounded-lg mr-2 ${
+      isSelected ? "bg-sunagorik" : "bg-gray-200"
+    }`}
+  >
+    <Text
+      className={`text-sm ${
+        isSelected ? "text-white" : "text-gray-700"
+      }`}
+    >
+      {status}
+    </Text>
+  </Pressable>
+));
+
 const Feed = () => {
   const { profile } = useAuth();
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const { selectedFilters, setSelectedFilters, filterParams } = usePostFilters(profile?.id);
   
-  const getFilterParams = useCallback(() => {
-    const filters: FilterParams = {
-      limit: 5,
-    };
-    
-    selectedFilters.forEach(status => {
-      if (status === "Severe") {
-        filters.severity = true;
-      } else if (status === "My Posts") {
-        filters.user_id = profile?.id;
-      } else {
-        if (!filters.status) filters.status = [];
-        filters.status.push(status.toLowerCase());
-      }
-    });
-    
-    return filters;
-  }, [selectedFilters, profile?.id]);
-
   const { 
     data, 
     error, 
-    isLoading, 
+    isLoading,
+    isFetching, 
     isFetchingNextPage, 
     hasNextPage, 
     fetchNextPage, 
     refetch 
-  } = usePostList(getFilterParams());
+  } = usePostList(filterParams);
 
   const loadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -72,7 +109,7 @@ const Feed = () => {
 
   const renderFooter = () => {
     if (!isFetchingNextPage) return null;
-    return <RNActivityIndicator size="small" color="#000" />;
+    return <ActivityIndicator size="small" color="#000" />;
   };
 
   const flattenedPosts = data?.pages.flatMap(page => page.data) ?? [];
@@ -81,56 +118,46 @@ const Feed = () => {
     <MemoizedReportCard post={item} />
   ), []);
 
+  const renderFilterItem = useCallback(({ item: status }) => (
+    <FilterItem
+      status={status}
+      isSelected={selectedFilters.includes(status)}
+      onPress={() => {
+        setSelectedFilters((prev) =>
+          prev.includes(status)
+            ? prev.filter((item) => item !== status)
+            : [...prev, status]
+        );
+      }}
+    />
+  ), [selectedFilters]);
+
   if (isLoading) {
     return <ActivityIndicator visible={true} />;
   }
 
   return (
     <SafeAreaView className="px-2">
-      <View className="flex flex-row justify-between">
-        {["My Posts", "Pending", "In Progress", "Resolved", "Severe"].map(
-          (status) => (
-            <Pressable
-              key={status}
-              onPress={() => {
-                setSelectedFilters((prev) =>
-                  prev.includes(status)
-                    ? prev.filter((item) => item !== status)
-                    : [...prev, status]
-                );
-              }}
-              className={`border-2 border-[#d6d4d4] rounded-md p-2 bg-sunagorik my-2 ${
-                selectedFilters.includes(status) ? "bg-sunagorik" : "bg-white"
-              }`}
-            >
-              <Text
-                className={`${
-                  selectedFilters.includes(status) ? "text-white" : "text-black"
-                } font-JakartaBold text-xs`}
-              >
-                {status}
-              </Text>
-            </Pressable>
-          )
-        )}
-      </View>
-
       <FlatList
-        showsVerticalScrollIndicator={false}
+        data={FILTER_OPTIONS}
+        renderItem={renderFilterItem}
+        keyExtractor={(item) => item}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="py-2"
+      />
+      <FlatList
         data={flattenedPosts}
         renderItem={renderItem}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: 160 }}
-        ListEmptyComponent={EmptyListComponent}
-        ListFooterComponent={renderFooter}
+        keyExtractor={(item) => item.id.toString()}
+        refreshing={isFetching}
+        onRefresh={refetch}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
-        refreshing={isLoading}
-        onRefresh={refetch}
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={5}
-        windowSize={5}
-        initialNumToRender={5}
+        ListEmptyComponent={EmptyListComponent}
+        ListFooterComponent={renderFooter}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 150 }}
       />
     </SafeAreaView>
   );
