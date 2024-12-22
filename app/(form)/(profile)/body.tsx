@@ -11,7 +11,7 @@ import ErrorMessage from "@/components/ErrorMessage";
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import debounce from 'lodash/debounce';
-import ProfileProgress from "@/components/ProfileProgress";
+import ProfileProgress from "@/components/ProgressSteps";
 import GenderSelect from "@/components/GenderSelect";
 
 const validationSchema = Yup.object().shape({

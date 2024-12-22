@@ -1,18 +1,17 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
-import { useFormContext } from "../../../providers/PostFormProvider";
-import { useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import StarRating from "@/components/StarRating";
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import ErrorMessage from "@/components/ErrorMessage";
 import CustomButton from "@/components/CustomButton";
-import { neighborhoods } from "@/constants";
-import NeighborhoodDropdown from "@/components/NeighborhoodDropdown";
+import ErrorMessage from "@/components/ErrorMessage";
 import InputField from "@/components/InputField";
-import { FontAwesome } from "@expo/vector-icons";
+import NeighborhoodDropdown from "@/components/NeighborhoodDropdown";
+import StarRating from "@/components/StarRating";
+import { neighborhoods } from "@/constants";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useRouter } from "expo-router";
+import { Formik } from 'formik';
+import React, { useState } from "react";
+import { ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import * as Yup from 'yup';
+import { useFormContext } from "../../../providers/PostFormProvider";
 
 const validationSchema = Yup.object().shape({
   title: Yup.string()
@@ -30,8 +29,6 @@ const validationSchema = Yup.object().shape({
 export default function FormBody() {
   const { formData, updateFormData } = useFormContext();
   const router = useRouter();
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const initialValues = {
     title: formData.title || "",
@@ -39,10 +36,6 @@ export default function FormBody() {
     description: formData.description || "",
     severity: formData.severity || 0,
   };
-
-  const filteredNeighborhoods = neighborhoods.filter(n => 
-    n.en.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const handleSubmit = (values: typeof initialValues) => {
     updateFormData(values);
@@ -99,7 +92,7 @@ export default function FormBody() {
             <ErrorMessage error={errors.severity} visible={touched.severity} />
 
             {/* Submit Button */}
-            <CustomButton title="Next" onPress={handleSubmit} className="mt-4" />
+            <CustomButton title="Next" onPress={handleSubmit} className="mt-8" />
           </ScrollView>
         )}
       </Formik>

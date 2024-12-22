@@ -1,7 +1,10 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { FormProvider } from "../../../providers/ProfileFormProvider";
+import { TouchableOpacity, Text } from "react-native";
 
 const Layout = () => {
+  const router = useRouter();
+
   return (
     <FormProvider>
       <Stack>
@@ -15,7 +18,19 @@ const Layout = () => {
         />
         <Stack.Screen
           name="avatar"
-          options={{ title: "Avatar", headerShown: true }}
+          options={{
+            title: "Update Avatar",
+            headerShown: true,
+            headerBackVisible: false,
+            headerRight: () => (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => router.replace("/(root)/(tabs)/profile")}
+              >
+                <Text className="font-semibold text-lg mr-2">Cancel</Text>
+              </TouchableOpacity>
+            ),
+          }}
         />
       </Stack>
     </FormProvider>

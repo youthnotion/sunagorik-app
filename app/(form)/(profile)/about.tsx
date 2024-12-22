@@ -3,7 +3,7 @@ import CustomButton from "@/components/CustomButton";
 import ErrorMessage from "@/components/ErrorMessage";
 import InputField from "@/components/InputField";
 import NeighborhoodDropdown from "@/components/NeighborhoodDropdown";
-import ProfileProgress from "@/components/ProfileProgress";
+import ProfileProgress from "@/components/ProgressSteps";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useFormik } from "formik";
