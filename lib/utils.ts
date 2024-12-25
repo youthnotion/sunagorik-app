@@ -1,5 +1,3 @@
-
-
 export function formatTime(minutes: number): string {
     const formattedMinutes = +minutes?.toFixed(0) || 0;
 
@@ -12,25 +10,35 @@ export function formatTime(minutes: number): string {
     }
 }
 
-export function formatDate(dateString: string): string {
+const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+
+export function convertToBanglaNumber(number: number): string {
+    return number.toString().split('').map(d => banglaDigits[parseInt(d)] || d).join('');
+}
+
+export function formatDate(dateString: string, locale: string = 'en'): string {
     const date = new Date(dateString);
     const day = date.getDate();
-    const monthNames = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-    ];
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
-
-    return `${day < 10 ? "0" + day : day} ${month} ${year}`;
+    
+    const monthNames = {
+        en: [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ],
+        bn: [
+            "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
+            "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"
+        ]
+    };
+    
+    const month = monthNames[locale][date.getMonth()];
+    const year = date.getFullYear().toString();
+    
+    if (locale === 'bn') {
+        const banglaDay = convertToBanglaNumber(day);
+        const banglaYear = convertToBanglaNumber(parseInt(year));
+        return `${banglaDay} ${month}, ${banglaYear}`;
+    }
+    
+    return `${day} ${month}, ${year}`;
 }

@@ -1,0 +1,286 @@
+{
+  "common": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "ok": "OK",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "next": "Next",
+    "language": "  Language",
+    "selectLanguage": "Select Language",
+    "status": {
+      "pending": "Pending",
+      "in progress": "In Progress",
+      "resolved": "Resolved"
+    }
+  },
+  "report": {
+    "category": {
+    "locationPermission": {
+      "title": "Permission Denied",
+      "message": "Location permission is required to post your report"
+    },
+    "locationServices": {
+      "title": "Location Services Disabled",
+      "message": "Please enable location services in your device settings to post your report"
+    },
+    "locationError": {
+      "title": "Error",
+      "message": "Unable to access location services"
+    },
+    "categories": {
+      "crimeHotspot": "Crime Hotspot",
+      "draingeFailure": "Drainage Failure",
+      "overpricedShop": "Overpriced Grocery Shop",
+      "roadBlocking": "Illegal Road Blocking",
+      "roadDamage": "Road Damage",
+      "tree": "Landmark Tree",
+      "wasteMismanagement": "Waste Mismanagement",
+      "waterSource": "Clean Water Source",
+      "toilet": "Public Toilet"
+    }
+  },
+    "description": {
+      "header": "Description",
+      "details": "Details",
+      "detailsPlaceholder": "Describe the problem in detail"
+    },
+    "image": {
+      "header": "Upload Image",
+      "noImage": "No image selected",
+      "takePhoto": "Take Photo",
+      "gallery": "Gallery",
+      "submit": "Submit",
+      "locationPermission": {
+        "title": "Permission denied",
+        "message": "Location permission is required"
+      },
+      "cameraPermission": {
+        "message": "Sorry, we need camera permissions to make this work!"
+      },
+      "uploadError": "Error uploading image!",
+      "success": {
+        "title": "Success!",
+        "message": "Your report has been submitted successfully."
+      },
+      "error": {
+        "title": "Error",
+        "message": "Failed to submit report. Please try again."
+      }
+    },
+    "body": {
+      "title": {
+        "label": "Title",
+        "placeholder": "Write a caption for your post",
+        "validation": {
+          "required": "Title is required",
+          "min": "Title must be at least 10 characters",
+          "max": "Title must be less than 240 characters"
+        }
+      },
+      "neighborhood": {
+        "label": "Neighborhood",
+        "placeholder": "Start typing the name of your area",
+        "validation": {
+          "required": "Neighborhood is required"
+        }
+      },
+      "severity": {
+        "label": "Severity",
+        "validation": {
+          "required": "Please select severity"
+        }
+      },
+      "next": "Next"
+    },
+    "details": {
+      "label": "Details",
+      "placeholder": "Enter details (optional)"
+    }
+  },
+  "feed": {
+    "filters": {
+      "myPosts": "My Posts",
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "resolved": "Resolved",
+      "severe": "Severe"
+    },
+    "noPosts": "No posts found",
+    "reportCard": {
+      "reportedAt": "Reported At",
+      "postedBy": "Posted By",
+      "category": "Category",
+      "status": "Report Status"
+    }
+  },
+  "reportDetail": {
+    "severity": "Severity",
+    "votes": "Votes",
+    "rateButton": {
+      "rate": "Rate Severity",
+      "rated": "Rated"
+    },
+    "reportButton": {
+      "report": "False Report",
+      "reported": "Reported"
+    },
+    "confirmReport": {
+      "title": "Confirm",
+      "message": "Are you sure you want to report this as false?",
+      "cancel": "Cancel",
+      "report": "Report"
+    },
+    "reportSuccess": {
+      "title": "Success",
+      "message": "Your report has been submitted successfully!"
+    },
+    "reportError": {
+      "title": "Error",
+      "message": "Failed to submit report. Please try again later."
+    },
+    "rateModal": {
+      "title": "Rate Severity",
+      "submit": "Submit",
+      "close": "Close"
+    },
+    "rateSuccess": {
+      "title": "Success",
+      "message": "Your severity rating has been submitted successfully!"
+    },
+    "rateError": {
+      "title": "Error",
+      "message": "Failed to submit rating. Please try again."
+    },
+    "statusModal": {
+      "title": "Change Status",
+      "note": "Note",
+      "notePlaceholder": "Add a short note on status update...",
+      "submit": "Submit",
+      "close": "Close"
+    },
+    "statusSuccess": {
+      "title": "Success",
+      "message": "Report status has been updated successfully!"
+    },
+    "statusError": {
+      "title": "Error",
+      "message": "Failed to update status. Please try again."
+    }
+  },
+  "profile": {
+    "reportsPosted": "Reports Posted",
+    "resolved": "Resolved",
+    "inProgress": "In Progress",
+    "citizenScore": "Citizen Score",
+    "logout": "  Logout",
+    "language": "  Language"
+  },
+  "auth": {
+    "signIn": {
+      "welcome": "Welcome",
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter your email",
+        "validation": {
+          "required": "Email is required",
+          "invalid": "Invalid email"
+        }
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Enter your password",
+        "validation": {
+          "required": "Password is required",
+          "minLength": "Password must be at least 8 characters",
+          "complexity": "Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number",
+          "specialChars": "Invalid special character. Only ! @ # $ % ^ & * ( ) , . ? _ - + = are allowed"
+        }
+      },
+      "button": "Sign In",
+      "noAccount": "Don't have an account? ",
+      "signUp": "Sign Up",
+      "emailVerification": {
+        "title": "Email Not Verified",
+        "message": "Would you like to resend the verification email?",
+        "cancel": "Cancel",
+        "resend": "Resend",
+        "success": "Verification email sent! Please check your inbox."
+      },
+      "error": {
+        "title": "Error",
+        "generic": "An unexpected error occurred"
+      }
+    },
+    "signUp": {
+      "welcome": "Create Your Account",
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter your email",
+        "validation": {
+          "required": "Email is required",
+          "invalid": "Invalid email"
+        }
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Enter your password",
+        "validation": {
+          "required": "Password is required",
+          "minLength": "Password must be at least 8 characters",
+          "complexity": "Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number",
+          "specialChars": "Invalid special character. Only ! @ # $ % ^ & * ( ) , . ? _ - + = are allowed"
+        }
+      },
+      "button": "Sign Up",
+      "haveAccount": "Already have an account? ",
+      "signIn": "Sign In",
+      "success": {
+        "title": "Success",
+        "message": "Account created successfully. Please check your email to verify your account"
+      },
+      "error": {
+        "title": "Error",
+        "generic": "An unexpected error occurred"
+      }
+    },
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "signUpTitle": "Create Your Account",
+    "googleSignIn": "Sign In with Google",
+    "signInPrompt": "Already have an account?",
+    "signUpPrompt": "Don't have an account?"
+  },
+  "components": {
+    "neighborhoodDropdown": {
+      "label": "Neighborhood",
+      "placeholder": "Start typing the name of your area",
+      "validation": {
+        "invalidSelection": "Please select a neighborhood from the list"
+      }
+    }
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "getStarted": "Get Started",
+    "slides": [
+      {
+        "title": "Identify Problems",
+        "description": "Find problems that is bugging you in your neighbourhood."
+      },
+      {
+        "title": "Take Actions",
+        "description": "Report the problems on Sunagorik to solve them."
+      },
+      {
+        "title": "Solved!",
+        "description": "Local government is here to respond to your concerns."
+      }
+    ]
+  }
+}

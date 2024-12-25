@@ -92,20 +92,14 @@ export const animations = {
 export const onboarding = [
   {
     id: 1,
-    title: "Identify Problems",
-    description: "Find problems that is bugging you in your neighbourhood.",
     image: images.screen1,
   },
   {
     id: 2,
-    title: "Take Actions",
-    description: "Report the problems on Sunagorik to solve them.",
     image: images.screen2,
   },
   {
     id: 3,
-    title: "Solved!!",
-    description: "Local government is here to respond to your concerns.",
     image: images.screen3,
   },
 ];
@@ -116,42 +110,42 @@ export const data = {
 
 export const categories: CategoryOption[] = [
   {
-    id: "1",
+    id: "crimeHotspot",
     title: "Crime Hotspot",
     image: crimeHotspot, // Adjust path as needed
   },
   {
-    id: "2",
+    id: "draingeFailure",
     title: "Drainage Failure",
     image: drainageFailure,
   },
   {
-    id: "3",
+    id: "overpricedShop",
     title: "Overpriced Grocery Shop",
     image: overpricedShop,
   },
   {
-    id: "4",
+    id: "roadBlocking",
     title: "Illegal Road Blocking",
     image: roadBlocking,
   },
   {
-    id: "5",
+    id: "roadDamage",
     title: "Road Damage",
     image: roadDamage,
   },
   {
-    id: "6",
+    id: "tree",
     title: "Landmark Tree",
     image: tree,
   },
   {
-    id: "7",
+    id: "wasteMismanagement",
     title: "Waste Mismanagement",
     image: wasteMismanagement,
   },
   {
-    id: "8",
+    id: "waterSource",
     title: "Clean Water Source",
     image: waterSource,
   },

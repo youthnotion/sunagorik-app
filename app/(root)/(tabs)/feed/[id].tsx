@@ -8,7 +8,7 @@ import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import StarRating from "@/components/StarRating";
 import { getImageUrl } from "@/lib/supabase";
-import { formatDate } from "@/lib/utils";
+import { formatDate, convertToBanglaNumber } from "@/lib/utils";
 import { useAuth } from "@/providers/AuthProvider";
 import {
   MaterialCommunityIcons
@@ -28,8 +28,10 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { useTranslation } from 'react-i18next';
 
 const ReportDetailScreen = () => {
+  const { t, i18n } = useTranslation();
   const { id } = useLocalSearchParams();
   const { profile, role } = useAuth();
   const [isRateModalVisible, setRateModalVisible] = useState(false);
@@ -57,15 +59,15 @@ const ReportDetailScreen = () => {
 
   const handleFalseReport = () => {
     Alert.alert(
-      "Confirm",
-      "Are you sure you want to report this as false?",
+      t('reportDetail.confirmReport.title'),
+      t('reportDetail.confirmReport.message'),
       [
         {
-          text: "Cancel",
+          text: t('reportDetail.confirmReport.cancel'),
           style: "cancel",
         },
         {
-          text: "Report",
+          text: t('reportDetail.confirmReport.report'),
           style: "destructive",
           onPress: () =>
             createFalseReport(
@@ -73,15 +75,15 @@ const ReportDetailScreen = () => {
               {
                 onSuccess: () => {
                   Alert.alert(
-                    "Success",
-                    "Your report has been submitted successfully!"
+                    t('reportDetail.reportSuccess.title'),
+                    t('reportDetail.reportSuccess.message')
                   );
                   refetchFalseReports();
                 },
                 onError: (error) => {
                   Alert.alert(
-                    "Error",
-                    "Failed to submit report. Please try again later."
+                    t('reportDetail.reportError.title'),
+                    t('reportDetail.reportError.message')
                   );
                 },
               }
@@ -93,8 +95,6 @@ const ReportDetailScreen = () => {
       }
     );
   };
-
-  console.log(profile);
 
   return (
     <>
@@ -114,12 +114,12 @@ const ReportDetailScreen = () => {
 
           <View className="mb-4 flex-row items-center">
             <View className="w-12 h-12 rounded-full border-2 border-sunagorik p-[2px]">
-            <Image
-              source={
-                getImageUrl("avatars", report.reporter.avatar_url)
-                  ? { uri: getImageUrl("avatars", report.reporter.avatar_url) }
-                  : require("@/assets/images/avatar.png")
-              }
+              <Image
+                source={
+                  getImageUrl("avatars", report.reporter.avatar_url)
+                    ? { uri: getImageUrl("avatars", report.reporter.avatar_url) }
+                    : require("@/assets/images/avatar.png")
+                }
                 className="w-full h-full rounded-full"
               />
             </View>
@@ -130,7 +130,9 @@ const ReportDetailScreen = () => {
               <View className="flex-row items-center gap-x-2">
                 <FontAwesome name="star" size={14} color="#CF322C" />
                 <Text className="text-xs font-JakartaMedium ml-1">
-                  {report.reporter.citizen_score}
+                  {i18n.language === 'bn' 
+                    ? convertToBanglaNumber(report.reporter.citizen_score)
+                    : report.reporter.citizen_score}
                 </Text>
               </View>
             </View>
@@ -147,14 +149,18 @@ const ReportDetailScreen = () => {
             <View className="flex flex-row items-center gap-x-2">
               <FontAwesome name="star" size={20} color="#CF322C" />
               <Text className="text-md font-JakartaMedium">
-                Severity: {report.severity_score}
+                {t('reportDetail.severity')}: {i18n.language === 'bn' 
+                  ? convertToBanglaNumber(report.severity_score)
+                  : report.severity_score}
               </Text>
             </View>
 
             <View className="flex flex-row items-center gap-x-2">
               <Octicons name="people" size={20} color="#CF322C" />
               <Text className="text-md font-JakartaMedium">
-                Votes: {report.votes}
+                {t('reportDetail.votes')}: {i18n.language === 'bn'
+                  ? convertToBanglaNumber(report.votes)
+                  : report.votes}
               </Text>
             </View>
           </View>
@@ -163,7 +169,9 @@ const ReportDetailScreen = () => {
             <View className="flex-1 mr-2">
               <CustomButton
                 title={
-                  userRating > 0 ? `  ${userRating} Rated ` : "  Rate Severity"
+                  userRating > 0 
+                    ? `  ${i18n.language === 'bn' ? convertToBanglaNumber(userRating) : userRating} ${t('reportDetail.rateButton.rated')}` 
+                    : `  ${t('reportDetail.rateButton.rate')}`
                 }
                 onPress={() => setRateModalVisible(true)}
                 disabled={userRating > 0}
@@ -175,7 +183,9 @@ const ReportDetailScreen = () => {
             </View>
             <View className="flex-1 ml-2">
               <CustomButton
-                title={hasUserReported ? "  Reported" : "  False Report"}
+                title={hasUserReported 
+                  ? `  ${t('reportDetail.reportButton.reported')}` 
+                  : `  ${t('reportDetail.reportButton.report')}`}
                 onPress={handleFalseReport}
                 disabled={hasUserReported}
                 bgVariant={hasUserReported ? "secondary" : "primary"}
@@ -200,13 +210,13 @@ const ReportDetailScreen = () => {
                 color="#cf322c"
               />
               <Text className="text-sm font-JakartaMedium text-gray-500 text-center mt-1">
-                {report.category}
+                {t(`report.category.categories.${report.category}`)}
               </Text>
             </View>
 
             {/* Status */}
             <Pressable
-              className={`items-center flex-1 py-2 ${
+              className={`items-center flex-1 ${
                 role === "authority"
                   ? "bg-sunagorik/20 active:bg-sunagorik/40 rounded-xl"
                   : ""
@@ -224,7 +234,7 @@ const ReportDetailScreen = () => {
               <Text
                 className={`text-sm capitalize font-JakartaMedium mt-1 text-gray-500`}
               >
-                {report.status}
+                {t(`common.status.${report.status}`)}
               </Text>
             </Pressable>
 
@@ -236,7 +246,7 @@ const ReportDetailScreen = () => {
                 color="#cf322c"
               />
               <Text className="text-sm font-JakartaMedium text-gray-500 text-center mt-1">
-                {formatDate(report.created_at)}
+                {formatDate(report.created_at, i18n.language)}
               </Text>
             </View>
           </View>
@@ -260,7 +270,9 @@ const ReportDetailScreen = () => {
             <View className="w-16 h-1 bg-gray-300 rounded-full" />
           </View>
 
-          <Text className="text-xl font-JakartaBold mb-8">Rate Severity</Text>
+          <Text className="text-xl font-JakartaBold mb-8">
+            {t('reportDetail.rateModal.title')}
+          </Text>
 
           <View className="items-center mb-8">
             <StarRating rating={rating} onRatingChange={setRating} size={40} />
@@ -269,7 +281,7 @@ const ReportDetailScreen = () => {
           <View className="flex-row w-full pb-4">
             <View className="flex-1 mr-2">
               <CustomButton
-                title="Submit"
+                title={t('reportDetail.rateModal.submit')}
                 onPress={() => {
                   createSeverityRating(
                     {
@@ -280,16 +292,16 @@ const ReportDetailScreen = () => {
                     {
                       onSuccess: () => {
                         Alert.alert(
-                          "Success",
-                          "Your severity rating has been submitted successfully!"
+                          t('reportDetail.rateSuccess.title'),
+                          t('reportDetail.rateSuccess.message')
                         );
                         setRateModalVisible(false);
                         refetchSeverityRating();
                       },
                       onError: (error) => {
                         Alert.alert(
-                          "Error",
-                          "Failed to submit rating. Please try again."
+                          t('reportDetail.rateError.title'),
+                          t('reportDetail.rateError.message')
                         );
                         setRateModalVisible(false);
                       },
@@ -300,7 +312,7 @@ const ReportDetailScreen = () => {
             </View>
             <View className="flex-1 ml-2">
               <CustomButton
-                title="Close"
+                title={t('reportDetail.rateModal.close')}
                 onPress={() => setRateModalVisible(false)}
               />
             </View>
@@ -320,7 +332,7 @@ const ReportDetailScreen = () => {
           </View>
 
           <Text className="text-lg font-JakartaSemiBold mb-4">
-            Change Status
+            {t('reportDetail.statusModal.title')}
           </Text>
 
           <View className="flex-row justify-between">
@@ -338,19 +350,19 @@ const ReportDetailScreen = () => {
                     reportStatus === status ? "text-white" : "text-gray-700"
                   }`}
                 >
-                  {status}
+                  {t(`common.status.${status}`)}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
           <InputField
-            placeholder="Add a short note on status update..."
+            placeholder={t('reportDetail.statusModal.notePlaceholder')}
             multiline
             numberOfLines={4}
             keyboardType="default"
             textAlignVertical="top"
-            label={"Note"}
+            label={t('reportDetail.statusModal.note')}
             value={statusNote}
             onChangeText={setStatusNote}
             editable={reportStatus !== report.status}
@@ -360,7 +372,7 @@ const ReportDetailScreen = () => {
           <View className="flex-row w-full mt-4">
             <View className="flex-1 mr-2">
               <CustomButton
-                title="Submit"
+                title={t('reportDetail.statusModal.submit')}
                 disabled={reportStatus === report.status}
                 bgVariant={reportStatus === report.status ? "secondary" : "primary"}
                 onPress={() => {
@@ -374,15 +386,15 @@ const ReportDetailScreen = () => {
                     {
                       onSuccess: () => {
                         Alert.alert(
-                          "Success",
-                          "Report status has been updated successfully!"
+                          t('reportDetail.statusSuccess.title'),
+                          t('reportDetail.statusSuccess.message')
                         );
                         setStatusModalVisible(false);
                       },
                       onError: (error) => {
                         Alert.alert(
-                          "Error",
-                          "Failed to update status. Please try again."
+                          t('reportDetail.statusError.title'),
+                          t('reportDetail.statusError.message')
                         );
                         setStatusModalVisible(false);
                       },
@@ -394,7 +406,7 @@ const ReportDetailScreen = () => {
             <View className="flex-1 ml-2">
               <CustomButton
                 bgVariant="secondary"
-                title="Close"
+                title={t('reportDetail.statusModal.close')}
                 onPress={() => setStatusModalVisible(false)}
               />
             </View>

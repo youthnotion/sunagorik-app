@@ -14,7 +14,10 @@ import { randomUUID } from "expo-crypto";
 import { useCreatePost } from "@/api/post/index";
 import { useAuth } from "@/providers/AuthProvider";
 import ActivityIndicator from "@/components/ActivityIndicator";
+import { useTranslation } from 'react-i18next';
+
 export default function ImageUpload() {
+  const { t } = useTranslation();
   const { profile } = useAuth();
   const { formData, updateFormData } = useFormContext();
   const router = useRouter();
@@ -31,7 +34,10 @@ export default function ImageUpload() {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
-          Alert.alert("Permission denied", "Location permission is required");
+          Alert.alert(
+            t('report.image.locationPermission.title'),
+            t('report.image.locationPermission.message')
+          );
           return;
         }
 
@@ -41,10 +47,7 @@ export default function ImageUpload() {
           longitude: position.coords.longitude,
         };
 
-        // First update local state
         setLocation(newLocation);
-
-        // Then explicitly update form data
         updateFormData({ location: newLocation });
       } catch (error) {
         console.error("Error getting location:", error);
@@ -55,10 +58,9 @@ export default function ImageUpload() {
   }, []);
 
   const getImageTypeFromBase64 = (base64String: string) => {
-    // Check the base64 header to determine file type
     if (base64String.startsWith("/9j/")) return "jpg";
     if (base64String.startsWith("iVBORw0KGgo")) return "png";
-    return "jpg"; // default fallback
+    return "jpg";
   };
 
   const uploadImage = async () => {
@@ -88,7 +90,7 @@ export default function ImageUpload() {
       else return uploadData.path;
     } catch (error) {
       console.error("Error uploading image:", error);
-      alert("Error uploading image!");
+      alert(t('report.image.uploadError'));
     }
   };
 
@@ -107,7 +109,7 @@ export default function ImageUpload() {
   const takePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
-      alert("Sorry, we need camera permissions to make this work!");
+      alert(t('report.image.cameraPermission.message'));
       return;
     }
 
@@ -152,11 +154,11 @@ export default function ImageUpload() {
             setIsSubmitting(false);
             console.log("Post created successfully:", data);
             Alert.alert(
-              "Success!",
-              "Your report has been submitted successfully.",
+              t('report.image.success.title'),
+              t('report.image.success.message'),
               [
                 {
-                  text: "OK",
+                  text: t('common.ok'),
                   onPress: () => {
                     updateFormData({});
                     router.replace("/(root)/(tabs)/feed");
@@ -168,17 +170,21 @@ export default function ImageUpload() {
           onError: (error) => {
             setIsSubmitting(false);
             console.error("Post creation failed:", error);
-            Alert.alert("Error", "Failed to submit report. Please try again.", [
-              { text: "OK" },
-            ]);
+            Alert.alert(
+              t('report.image.error.title'),
+              t('report.image.error.message'),
+              [{ text: t('common.ok') }]
+            );
           },
         });
       } catch (error) {
         setIsSubmitting(false);
         console.error("Submission error:", error);
-        Alert.alert("Error", "Failed to submit report. Please try again.", [
-          { text: "OK" },
-        ]);
+        Alert.alert(
+          t('report.image.error.title'),
+          t('report.image.error.message'),
+          [{ text: t('common.ok') }]
+        );
       }
     }
   };
@@ -186,7 +192,6 @@ export default function ImageUpload() {
   return (
     <SafeAreaView className="flex-1 p-2">
       <View className="flex-1">
-        {/* Image Preview */}
         {image ? (
           <View className="h-2/3 items-center justify-center border-2 border-dashed border-gray-300 rounded-lg mb-4">
             <Image
@@ -204,18 +209,17 @@ export default function ImageUpload() {
         ) : (
           <View className="h-2/3 items-center justify-center border-2 border-dashed border-gray-300 rounded-lg mb-4">
             <Ionicons name="image-outline" size={48} color="gray" />
-            <Text className="text-gray-500 mt-2">No image selected</Text>
+            <Text className="text-gray-500 mt-2">{t('report.image.noImage')}</Text>
           </View>
         )}
 
-        {/* Action Buttons */}
         <View className="flex-row gap-4 mb-4">
           <TouchableOpacity
             onPress={takePhoto}
             className="flex-1 flex-row items-center justify-center bg-sunagorik p-4 rounded-lg"
           >
             <Ionicons name="camera" size={24} color="white" className="mr-2" />
-            <Text className="text-white font-semibold ml-2">Take Photo</Text>
+            <Text className="text-white font-semibold ml-2">{t('report.image.takePhoto')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -223,11 +227,10 @@ export default function ImageUpload() {
             className="flex-1 flex-row items-center justify-center bg-sunagorik p-4 rounded-lg"
           >
             <Ionicons name="images" size={24} color="white" className="mr-2" />
-            <Text className="text-white font-semibold ml-2">Gallery</Text>
+            <Text className="text-white font-semibold ml-2">{t('report.image.gallery')}</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Submit Button */}
         <TouchableOpacity
           onPress={handleSubmission}
           disabled={!image || isSubmitting}
@@ -236,7 +239,7 @@ export default function ImageUpload() {
           }`}
         >
           <Text className="text-white text-center font-semibold text-lg">
-            Submit
+            {t('report.image.submit')}
           </Text>
         </TouchableOpacity>
         {<ActivityIndicator visible={isSubmitting} />}

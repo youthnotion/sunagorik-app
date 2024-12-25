@@ -4,16 +4,31 @@ import ReportCard from "@/components/ReportCard";
 import { images } from "@/constants";
 import { useAuth } from "@/providers/AuthProvider";
 import React, { memo, useCallback, useMemo, useState } from "react";
-import {
-  FlatList,
-  Image,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, Image, Pressable, Text, View, ActivityIndicator as RNActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslation } from 'react-i18next';
+import '@/lib/i18n';
 
+// Keep the filter options in English for logic
 const FILTER_OPTIONS = ["My Posts", "Pending", "In Progress", "Resolved", "Severe"];
+
+// Translation mapping for filter options
+const getFilterTranslationKey = (filter: string) => {
+  switch (filter) {
+    case "My Posts":
+      return "feed.filters.myPosts";
+    case "Pending":
+      return "feed.filters.pending";
+    case "In Progress":
+      return "feed.filters.inProgress";
+    case "Resolved":
+      return "feed.filters.resolved";
+    case "Severe":
+      return "feed.filters.severe";
+    default:
+      return filter;
+  }
+};
 
 const usePostFilters = (userId?: string) => {
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
@@ -51,42 +66,49 @@ const usePostFilters = (userId?: string) => {
 
 const MemoizedReportCard = memo(ReportCard);
 
-const EmptyListComponent = memo(() => (
-  <View className="flex flex-col items-center justify-center">
-    <Image
-      source={images.noResult}
-      className="w-40 h-40"
-      alt="We can't find any posts right now!"
-      resizeMode="contain"
-    />
-    <Text className="text-sm">
-      We can't find any posts right now!
-    </Text>
-  </View>
-));
+const EmptyListComponent = memo(() => {
+  const { t } = useTranslation();
+  return (
+    <View className="flex flex-col items-center justify-center">
+      <Image
+        source={images.noResult}
+        className="w-40 h-40"
+        alt={t('feed.noPosts')}
+        resizeMode="contain"
+      />
+      <Text className="text-sm">
+        {t('feed.noPosts')}
+      </Text>
+    </View>
+  );
+});
 
 const FilterItem = memo(({ status, isSelected, onPress }: { 
   status: string;
   isSelected: boolean; 
   onPress: () => void;
-}) => (
-  <Pressable
-    onPress={onPress}
-    className={`p-2 rounded-lg mr-2 ${
-      isSelected ? "bg-sunagorik" : "bg-gray-200"
-    }`}
-  >
-    <Text
-      className={`text-sm ${
-        isSelected ? "text-white" : "text-gray-700"
+}) => {
+  const { t } = useTranslation();
+  return (
+    <Pressable
+      onPress={onPress}
+      className={`p-2 rounded-lg mr-2 ${
+        isSelected ? "bg-sunagorik" : "bg-gray-200"
       }`}
     >
-      {status}
-    </Text>
-  </Pressable>
-));
+      <Text
+        className={`text-sm ${
+          isSelected ? "text-white" : "text-gray-700"
+        }`}
+      >
+        {t(getFilterTranslationKey(status))}
+      </Text>
+    </Pressable>
+  );
+});
 
 const Feed = () => {
+  const { t } = useTranslation();
   const { profile } = useAuth();
   const { selectedFilters, setSelectedFilters, filterParams } = usePostFilters(profile?.id);
   
@@ -109,7 +131,7 @@ const Feed = () => {
 
   const renderFooter = () => {
     if (!isFetchingNextPage) return null;
-    return <ActivityIndicator size="small" color="#000" />;
+    return <RNActivityIndicator size="small" color="#000" />;
   };
 
   const flattenedPosts = data?.pages.flatMap(page => page.data) ?? [];

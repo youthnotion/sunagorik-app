@@ -3,18 +3,23 @@ import ActivityIndicator from "@/components/ActivityIndicator";
 import CustomButton from "@/components/CustomButton";
 import { getImageUrl, supabase } from "@/lib/supabase";
 import { useAuth } from "@/providers/AuthProvider";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Image, ScrollView, Text, View, TouchableOpacity, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import '../../../lib/i18n';
 
 const Profile = () => {
   const { profile, refreshProfile } = useAuth();
   const { data: userReportStats, isLoading, refetch: refetchUserReportStats } = useUserReportStats(profile?.id);
   const [refreshing, setRefreshing] = useState(false);
   const [timestamp, setTimestamp] = useState(Date.now());
+  const [showLanguageSwitcher, setShowLanguageSwitcher] = useState(false);
+  const { t } = useTranslation();
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -111,7 +116,7 @@ const Profile = () => {
               </View>
               <View className="ml-2">
                 <Text className="text-4xl font-bold text-sunagorik">{userReportStats?.total}</Text>
-                <Text className="text-sm text-gray-600">Reports Posted</Text>
+                <Text className="text-sm text-gray-600">{t('profile.reportsPosted')}</Text>
               </View>
             </View>
           </View>
@@ -126,7 +131,7 @@ const Profile = () => {
               </View>
               <View className="ml-2">
                 <Text className="text-4xl font-bold text-sunagorik">{userReportStats?.resolved || 0}</Text>
-                <Text className="text-sm text-gray-600">Resolved</Text>
+                <Text className="text-sm text-gray-600">{t('profile.resolved')}</Text>
               </View>
             </View>
           </View>
@@ -145,7 +150,7 @@ const Profile = () => {
               </View>
               <View className="ml-2">
                 <Text className="text-4xl font-bold text-sunagorik">{userReportStats?.in_progress || 0}</Text>
-                <Text className="text-sm text-gray-600">In Progress</Text>
+                <Text className="text-sm text-gray-600">{t('profile.inProgress')}</Text>
               </View>
             </View>
           </View>
@@ -162,7 +167,7 @@ const Profile = () => {
                 <Text className="text-4xl font-bold text-sunagorik">
                   {(userReportStats?.total || 0) + ((userReportStats?.resolved || 0) * 10) + ((userReportStats?.in_progress || 0) * 5)}
                 </Text>
-                <Text className="text-sm text-gray-600">Citizen Score</Text>
+                <Text className="text-sm text-gray-600">{t('profile.citizenScore')}</Text>
               </View>
             </View>
           </View>
@@ -235,7 +240,7 @@ const Profile = () => {
         <View className="flex-row w-full p-4 mt-6">
           <View className="flex-1 mr-2">
             <CustomButton
-              title="  Logout"
+              title={t('profile.logout')}
               IconLeft={() => (
                 <AntDesign name="logout" size={20} color="white" />
               )}
@@ -244,17 +249,22 @@ const Profile = () => {
               }}
             />
           </View>
-          {/* <View className="flex-1 ml-2">
+          <View className="flex-1 ml-2">
             <CustomButton
               bgVariant="secondary"
-              title="  Language"
+              title={t('profile.language')}
               IconLeft={() => (
                 <Ionicons name="language" size={24} color="white" />
               )}
-              onPress={() => {}}
+              onPress={() => setShowLanguageSwitcher(true)}
             />
-          </View> */}
+          </View>
         </View>
+
+        <LanguageSwitcher 
+          visible={showLanguageSwitcher} 
+          onClose={() => setShowLanguageSwitcher(false)} 
+        />
       </ScrollView>
     </SafeAreaView>
   );

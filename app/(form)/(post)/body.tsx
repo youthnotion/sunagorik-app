@@ -12,23 +12,26 @@ import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Yup from 'yup';
 import { useFormContext } from "../../../providers/PostFormProvider";
-
-const validationSchema = Yup.object().shape({
-  title: Yup.string()
-    .trim()
-    .required('Title is required')
-    .min(10, 'Title must be at least 10 characters')
-    .max(240, 'Title must be less than 240 characters'),
-  neighborhood: Yup.string().required('Neighborhood is required'),
-  description: Yup.string(),
-  severity: Yup.number()
-    .min(1, 'Please select severity')
-    .required('Severity is required'),
-});
+import { useTranslation } from 'react-i18next';
 
 export default function FormBody() {
+  const { t } = useTranslation();
   const { formData, updateFormData } = useFormContext();
   const router = useRouter();
+
+  const validationSchema = Yup.object().shape({
+    title: Yup.string()
+      .trim()
+      .required(t('report.body.title.validation.required'))
+      .min(10, t('report.body.title.validation.min'))
+      .max(240, t('report.body.title.validation.max')),
+    neighborhood: Yup.string()
+      .required(t('report.body.neighborhood.validation.required')),
+    description: Yup.string(),
+    severity: Yup.number()
+      .min(1, t('report.body.severity.validation.required'))
+      .required(t('report.body.severity.validation.required')),
+  });
 
   const initialValues = {
     title: formData.title || "",
@@ -44,9 +47,9 @@ export default function FormBody() {
 
   return (
     <SafeAreaView className="flex-1 px-4">
-    <View className="items-center">
+      <View className="items-center">
         <View className="bg-gray-100 rounded-full">
-        <MaterialIcons name="post-add" size={80} color="#CF322C" />
+          <MaterialIcons name="post-add" size={80} color="#CF322C" />
         </View>
       </View>      
 
@@ -60,10 +63,10 @@ export default function FormBody() {
             {/* Title Input */}
             <View className="mb-2">
               <InputField
-                label="Title"
+                label={t('report.body.title.label')}
                 value={values.title}
                 onChangeText={handleChange('title')}
-                placeholder="Write a caption for your post"
+                placeholder={t('report.body.title.placeholder')}
                 onBlur={() => setFieldTouched('title')}
               />
               <ErrorMessage error={errors.title} visible={touched.title} />
@@ -81,7 +84,9 @@ export default function FormBody() {
             </View>
 
             {/* Severity */}
-            <Text className="text-black text-lg mb-2 font-medium">Severity</Text>
+            <Text className="text-black text-lg mb-2 font-medium">
+              {t('report.body.severity.label')}
+            </Text>
             <View className="justify-center items-center bg-white p-8 rounded-lg border border-gray-200">
               <StarRating 
                 rating={values.severity}
@@ -92,7 +97,11 @@ export default function FormBody() {
             <ErrorMessage error={errors.severity} visible={touched.severity} />
 
             {/* Submit Button */}
-            <CustomButton title="Next" onPress={handleSubmit} className="mt-8" />
+            <CustomButton 
+              title={t('common.next')} 
+              onPress={handleSubmit} 
+              className="mt-8" 
+            />
           </ScrollView>
         )}
       </Formik>

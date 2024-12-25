@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-nativ
 import { neighborhoods } from "@/constants";
 import ErrorMessage from "./ErrorMessage";
 import InputField from './InputField';
+import { useTranslation } from 'react-i18next';
 
 interface NeighborhoodDropdownProps {
   value: string;
@@ -24,6 +25,8 @@ export default function NeighborhoodDropdown({
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [customError, setCustomError] = useState<string | undefined>();
+  const { t } = useTranslation();
+
 
   const filteredNeighborhoods = neighborhoods.filter(n => 
     n.en.toLowerCase().includes(searchQuery.toLowerCase())
@@ -32,7 +35,7 @@ export default function NeighborhoodDropdown({
   const validateNeighborhood = (text: string) => {
     const isValid = !text || neighborhoods.some(n => n.en.toLowerCase() === text.toLowerCase());
     if (!isValid && text) {
-      setCustomError("Please select a neighborhood from the list");
+      setCustomError(t('components.neighborhoodDropdown.validation.invalidSelection'));
     } else {
       setCustomError(undefined);
     }
@@ -49,7 +52,7 @@ export default function NeighborhoodDropdown({
     <View className="">
       <View className="relative">
         <InputField
-          label="Neighborhood"
+          label={t('components.neighborhoodDropdown.label')}
           value={value}
           onChangeText={(text) => {
             setSearchQuery(text);
@@ -58,7 +61,7 @@ export default function NeighborhoodDropdown({
             validateNeighborhood(text);
           }}
           onFocus={() => setShowDropdown(true)}
-          placeholder="Start typing the name of your area"
+          placeholder={t('components.neighborhoodDropdown.placeholder')}
           onBlur={() => {
             validateNeighborhood(value);
             onBlur?.();

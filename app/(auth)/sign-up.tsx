@@ -12,18 +12,22 @@ import * as Yup from 'yup';
 import { supabase } from "@/lib/supabase";
 import { useState } from "react";
 import ActivityIndicator from "@/components/ActivityIndicator";
-
-const validationSchema = Yup.object().shape({
-  email: Yup.string().email('Invalid email').required('Email is required'),
-  password: Yup.string()
-    .required('Password is required')
-    .min(8, 'Password must be at least 8 characters')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number')
-    .matches(/^[A-Za-z0-9!@#$%^&*(),.?_\-+=]*$/, 'Invalid special character. Only ! @ # $ % ^ & * ( ) , . ? _ - + = are allowed'),
-});
+import { useTranslation } from 'react-i18next';
 
 const SignUp = () => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
+
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .email(t('auth.signUp.email.validation.invalid'))
+      .required(t('auth.signUp.email.validation.required')),
+    password: Yup.string()
+      .required(t('auth.signUp.password.validation.required'))
+      .min(8, t('auth.signUp.password.validation.minLength'))
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, t('auth.signUp.password.validation.complexity'))
+      .matches(/^[A-Za-z0-9!@#$%^&*(),.?_\-+=]*$/, t('auth.signUp.password.validation.specialChars')),
+  });
 
   const onSignUpPress = async (values: { email: string, password: string }) => {
     setIsLoading(true);
@@ -34,11 +38,11 @@ const SignUp = () => {
       });
 
       if (error) {
-        Alert.alert('Error', error.message);
+        Alert.alert(t('auth.signUp.error.title'), error.message);
         return;
       }
 
-      Alert.alert('Success', 'Account created successfully. Please check your email to verify your account', [{ 
+      Alert.alert(t('auth.signUp.success.title'), t('auth.signUp.success.message'), [{ 
         text: 'OK', 
         onPress: () => {
           router.replace('/(auth)/sign-in');
@@ -46,7 +50,7 @@ const SignUp = () => {
       }]);
       
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
+      Alert.alert(t('auth.signUp.error.title'), t('auth.signUp.error.generic'));
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +68,7 @@ const SignUp = () => {
               <View className="absolute bottom-5 left-5">
                 <View className=" bg-gray-100/70 px-4 py-2 rounded-lg">
                   <Text className="text-2xl text-black font-JakartaSemiBold">
-                    Create Your Account
+                    {t('auth.signUp.welcome')}
                   </Text>
                 </View>
               </View>
@@ -79,8 +83,8 @@ const SignUp = () => {
                 {({ handleChange, handleSubmit, values, errors, touched, setFieldTouched, isValid, dirty }) => (
                   <>
                     <InputField
-                      label="Email"
-                      placeholder="Enter your email"
+                      label={t('auth.signUp.email.label')}
+                      placeholder={t('auth.signUp.email.placeholder')}
                       keyboardType="email-address"
                       icon={icons.email}
                       value={values.email}
@@ -90,8 +94,8 @@ const SignUp = () => {
                     <ErrorMessage error={errors.email} visible={touched.email} />
 
                     <InputField
-                      label="Password"
-                      placeholder="Enter your password"
+                      label={t('auth.signUp.password.label')}
+                      placeholder={t('auth.signUp.password.placeholder')}
                       icon={icons.lock}
                       secureTextEntry={true}
                       value={values.password}
@@ -100,7 +104,7 @@ const SignUp = () => {
                     />
                     <ErrorMessage error={errors.password} visible={touched.password} />
                     <CustomButton
-                      title="Sign Up"
+                      title={t('auth.signUp.button')}
                       bgVariant={(!isValid || !dirty) ? "secondary" : "primary"}
                       onPress={handleSubmit}
                       className="mt-6"
@@ -116,8 +120,8 @@ const SignUp = () => {
                 onPress={() => router.replace("/sign-in")}
                 className="flex-row justify-center items-center mt-10"
               >
-                <Text className="text-md text-general-200">Already have an account? </Text>
-                <Text className="text-md text-sunagorik">Sign In</Text>
+                <Text className="text-md text-general-200">{t('auth.signUp.haveAccount')}</Text>
+                <Text className="text-md text-sunagorik">{t('auth.signUp.signIn')}</Text>
               </Pressable>
             </View>
           </View>
