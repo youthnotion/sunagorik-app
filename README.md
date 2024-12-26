@@ -1,6 +1,6 @@
-# Welcome to your Expo app 👋
+# Welcome to the codebase of the Sunagorik app 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app). Please ensure that your brain is braining before you go any further.
 
 ## Get started
 
