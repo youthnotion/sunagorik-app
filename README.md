@@ -2,9 +2,15 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app). Please ensure that your brain is braining before you go any further.
 
-## Get started
+![alt text](https://i.pinimg.com/originals/e8/d2/1b/e8d21b0b49a569b3abbd864440150fce.png)
 
-1. Install dependencies
+## Get started
+0. Clone this repository [Make sure to install Git first]
+   ```bash
+   git clone https://github.com/youthnotion/sunagorik-app.git
+   ```
+
+1. Install dependencies [Don't forget to install Node first]
 
    ```bash
    npm install
