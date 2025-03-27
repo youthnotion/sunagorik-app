@@ -9,6 +9,8 @@ import "react-native-reanimated";
 // import "../global.css";
 import OfflineNotice from "@/components/OfflineNotice";
 import { StatusBar } from "react-native";
+import "../lib/i18n/index";
+
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

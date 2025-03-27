@@ -3,6 +3,7 @@ import React from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { View } from "react-native";
 import ActivityIndicator from "@/components/ActivityIndicator";
+import "../lib/i18n/index";
 
 const Home = () => {
   const { session, loading, profile } = useAuth();

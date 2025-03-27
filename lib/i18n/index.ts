@@ -14,8 +14,10 @@ const LANGUAGE_DETECTOR = {
       const savedLanguage = await AsyncStorage.getItem('user-language');
       const language = savedLanguage || 'en';
       callback(language);
+      console.log('Language detected:', language);
     } catch {
       callback('en');
+      console.log('Language fallback:', 'en');
     }
   },
   init: () => {},

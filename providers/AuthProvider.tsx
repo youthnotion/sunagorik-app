@@ -67,7 +67,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     if (!session?.user?.id) return null;
       const profileData = await fetchProfile(session.user.id);
       setProfile(profileData);
-      console.log(profileData);
+      console.log('profileData: ', profileData);
       return profileData;
   };
 
@@ -92,8 +92,8 @@ export default function AuthProvider({ children }: PropsWithChildren) {
       }
       setLoading(false)
     };
-    console.log(session);
-    console.log(profile);
+    console.log('session', session);
+    console.log('profile', profile);
     
     fetchSession();
 
