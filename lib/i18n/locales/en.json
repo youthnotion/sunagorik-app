@@ -211,7 +211,7 @@
       },
       "error": {
         "title": "Error",
-        "generic": "An unexpected error occurred"
+        "generic": "Google ID token couldn't found. Please try again later."
       }
     },
     "signUp": {

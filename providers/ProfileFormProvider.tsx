@@ -3,9 +3,7 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 export interface ProfileData {
   id?: string;
   username: string;
-  fullName: string;
   gender: string;
-  avatar: any;
   about: string;
   neighborhood: string;
 }
@@ -21,9 +19,7 @@ const FormContext = createContext<FormContextType | undefined>(undefined);
 export function FormProvider({ children }: { children: ReactNode }) {
   const [formData, setFormData] = useState<ProfileData>({
     username: "",
-    fullName: "",
     gender: "",
-    avatar: null,
     about: "",
     neighborhood: "",
   });
@@ -41,9 +37,7 @@ export function FormProvider({ children }: { children: ReactNode }) {
   const resetProfile = () => {
     setFormData({
       username: "",
-      fullName: "",
       gender: "",
-      avatar: null,
       about: "",
       neighborhood: "",
     });

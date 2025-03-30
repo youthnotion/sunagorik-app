@@ -18,10 +18,7 @@ const validationSchema = Yup.object().shape({
   username: Yup.string()
     .required('Username is required')
     .min(3, 'Username must be at least 3 characters long')
-    .test('unique', 'Username is already taken', () => true), 
-  fullName: Yup.string()
-    .required('Full name is required')
-    .min(10, 'Full name must be at least 10 characters long'),
+    .test('unique', 'Username is already taken', () => true),
   gender: Yup.string()
     .required('Please select your gender')
     .oneOf(['male', 'female', 'other'], 'Invalid gender selection'),
@@ -72,7 +69,6 @@ export default function FormBody() {
   const formik = useFormik({
     initialValues: {
       username: formData.username || '',
-      fullName: formData.fullName || '',
       gender: formData.gender || '',
     },
     validationSchema,
@@ -124,17 +120,6 @@ export default function FormBody() {
           />
         </View>
 
-        <View>
-          <InputField
-            value={formik.values.fullName}
-            label="Full Name"
-            onChangeText={formik.handleChange('fullName')}
-            onBlur={formik.handleBlur('fullName')}
-            placeholder="Enter full name"
-          />
-          <ErrorMessage error={formik.errors.fullName} visible={formik.touched.fullName} />
-        </View>
-
         <View className="mb-4">
             <GenderSelect
               value={formik.values.gender}
@@ -147,9 +132,9 @@ export default function FormBody() {
         <CustomButton
           title="Next"
           onPress={formik.handleSubmit}
-          disabled={!formik.values.username || !formik.values.fullName || !formik.values.gender || isCheckingUsername || !!usernameError}
+          disabled={!formik.values.username || !formik.values.gender || isCheckingUsername || !!usernameError}
           className={`mt-8 p-4 rounded-lg ${
-            formik.values.username && formik.values.fullName && formik.values.gender && !isCheckingUsername && !usernameError ? "bg-sunagorik" : "bg-gray-300"
+            formik.values.username && formik.values.gender && !isCheckingUsername && !usernameError ? "bg-sunagorik" : "bg-gray-300"
           }`}
         />
       </ScrollView>

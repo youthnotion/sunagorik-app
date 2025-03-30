@@ -39,15 +39,17 @@ const Profile = () => {
 
   const logout = () => {
     supabase.auth.signOut();
-    router.replace("/(auth)/sign-in");
+    router.replace("/(auth)/sign-up");
   }
 
   if (isLoading) {
     return <ActivityIndicator visible={true} />
   }
 
-  const imageUrl = profile?.avatar_url 
-    ? `${getImageUrl("avatars", profile.avatar_url)}?t=${timestamp}`
+  const imageUrl = profile?.avatar_url
+    ? profile?.avatar_url.startsWith("https")
+    ? profile.avatar_url
+    : `${getImageUrl("avatars", profile.avatar_url)}?t=${timestamp}`
     : null;
 
   return (
@@ -85,8 +87,11 @@ const Profile = () => {
             </TouchableOpacity>
             <View className="ml-4 flex-1">
               <Text className="text-2xl font-bold text-white">
-                {profile?.username}
+                {profile?.full_name}
               </Text>
+              {/* <Text className="text-xs font-bold text-white">
+                @{profile?.username}
+              </Text> */}
               <Text className="text-sm text-gray-200">
                 {profile?.neighborhood}
               </Text>

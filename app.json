@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "versionCode": 4,
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyBuk5XyY5fNGL8FY7mJBCxcfkMXl34YqN0"
@@ -40,7 +41,8 @@
         }
       ],
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true
@@ -53,9 +55,7 @@
         "projectId": "cac597bf-6acc-42bd-b9e3-267ddca451ab"
       }
     },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/cac597bf-6acc-42bd-b9e3-267ddca451ab"
     }

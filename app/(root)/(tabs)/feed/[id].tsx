@@ -115,12 +115,14 @@ const ReportDetailScreen = () => {
           <View className="mb-4 flex-row items-center">
             <View className="w-12 h-12 rounded-full border-2 border-sunagorik p-[2px]">
               <Image
-                source={
-                  getImageUrl("avatars", report.reporter.avatar_url)
-                    ? { uri: getImageUrl("avatars", report.reporter.avatar_url) }
-                    : require("@/assets/images/avatar.png")
-                }
-                className="w-full h-full rounded-full"
+              source={
+                report.reporter.avatar_url
+                ? report.reporter.avatar_url.includes("https")
+                  ? { uri: report.reporter.avatar_url }
+                  : { uri: getImageUrl("avatars", report.reporter.avatar_url) }
+                : require("@/assets/images/avatar.png")
+              }
+              className="w-full h-full rounded-full"
               />
             </View>
             <View className="ml-3">

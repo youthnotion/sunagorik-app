@@ -39,6 +39,7 @@ import waterSource from "@/assets/icons/water-source.png";
 import loader from "@/assets/animations/loader.json";
 import catLoading from "@/assets/animations/cat_loading.json";
 import { CategoryOption } from "@/types/type";
+import signin from "@/assets/images/signin.jpg";
 
 export const images = {
   check,
@@ -47,6 +48,7 @@ export const images = {
   screen2,
   screen3,
   signup,
+  signin
 };
 
 export const icons = {

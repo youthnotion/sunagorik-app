@@ -53,12 +53,12 @@ export default function FormBody() {
     const profileData: ProfileData = {
       id: profile.id,
       username: formData.username,
-      fullName: formData.fullName,
       gender: formData.gender,
-      avatar: avatarPath,
-      about: formData.about,
-      neighborhood: formData.neighborhood,
+      about: formik.values.about,
+      neighborhood: formik.values.neighborhood,
     };
+
+    console.log(profileData);
 
     updateProfile(profileData, {
       onSuccess: (data) => {
