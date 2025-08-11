@@ -128,11 +128,6 @@ Helper functions and services:
    EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
    ```
 
-4. **Start the development server**
-   ```bash
-   npx expo start
-   ```
-
 ### Running the App
 
 #### Important Note About Expo Go Limitations
