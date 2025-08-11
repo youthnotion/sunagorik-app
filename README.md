@@ -21,7 +21,7 @@ The project follows a modular architecture with clear separation of concerns:
 
 ### Directory Structure
 
-```
+```bash
 sunagorik-app/
 ├── api/                  # API integration and endpoints
 ├── app/                  # Main application screens and navigation (file-based routing)
@@ -221,7 +221,7 @@ The app uses Expo Router for file-based navigation with a mix of Stack and Tab n
 
 ### Navigation Hierarchy
 
-```
+```bash
 app/
 ├── _layout.tsx                # Root Stack Navigator
 ├── (auth)/                    # Authentication Stack
