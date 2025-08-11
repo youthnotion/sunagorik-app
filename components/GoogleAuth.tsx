@@ -8,7 +8,7 @@ import {
 
 const GoogleAuth = () => {
     GoogleSignin.configure({
-        webClientId: '790312057233-0uminjbrt7l60pkmqvr6c0n42klf3cel.apps.googleusercontent.com', // client ID of type WEB for your server. Required to get the `idToken` on the user object, and for offline access.
+        webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     });
 
     const signIn = async () => {
