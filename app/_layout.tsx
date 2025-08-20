@@ -44,10 +44,11 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
           <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="index"  options={{ headerShown: false }} />
             <Stack.Screen name="(root)" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(form)" options={{ headerShown: false }} />
+            <Stack.Screen name="clan"   options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
           </Stack>
           <OfflineNotice />

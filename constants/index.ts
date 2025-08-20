@@ -40,6 +40,7 @@ import loader from "@/assets/animations/loader.json";
 import catLoading from "@/assets/animations/cat_loading.json";
 import { CategoryOption } from "@/types/type";
 import signin from "@/assets/images/signin.jpg";
+import clan from "@/assets/icons/clan.png";
 
 export const images = {
   check,
@@ -84,6 +85,7 @@ export const icons = {
   tree,
   wasteMismanagement,
   waterSource,
+  clan,
 };
 
 export const animations = {

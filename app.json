@@ -52,12 +52,13 @@
         "origin": false
       },
       "eas": {
-        "projectId": "cac597bf-6acc-42bd-b9e3-267ddca451ab"
+        "projectId": "1a03223a-ae39-4ddb-9ad5-545c5a745980"
       }
     },
     "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/cac597bf-6acc-42bd-b9e3-267ddca451ab"
-    }
+    },
+    "owner": "nur56"
   }
 }

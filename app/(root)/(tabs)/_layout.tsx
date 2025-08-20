@@ -94,6 +94,16 @@ const Layout = () => (
       }}
     />
     <Tabs.Screen
+      name="clan"
+      options={{
+        title: "Clans",
+        headerShown: false,
+        tabBarIcon: ({ focused }) => (
+          <TabIcon focused={focused} source={icons.clan} />
+        ),
+      }}
+    />
+    <Tabs.Screen
       name="profile"
       options={{
         title: "Profile",
