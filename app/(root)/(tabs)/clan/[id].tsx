@@ -4,9 +4,9 @@ import { View, Text, TouchableOpacity, Image, FlatList, Alert } from "react-nati
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { getImageUrl } from "@/lib/supabase";
 import ActivityIndicator from "@/components/ActivityIndicator";
-import { useCancelJoinRequest, useClanById, useIsClanAdmin, useRequestJoinClan } from "@/hooks/clanHooks";
 import ClanMembersTab from "@/components/ClanMembersTab";
 import ClanJoinRequestsTab from "@/components/ClanJoinRequestTab";
+import { useCancelJoinRequest, useClanById, useIsClanAdmin, useRequestJoinClan } from "@/api/clan";
 // import ClanJoinRequestsTab from "@/components/ClanJoinRequestsTab";
 
 export default function ClanDetails() {
@@ -19,6 +19,7 @@ export default function ClanDetails() {
   const requestJoinClan = useRequestJoinClan();
   const cancelRequest = useCancelJoinRequest();
   const {data:isAdmin} = useIsClanAdmin(id!);
+  const { data: clan, isLoading } = useClanById(id!);
 
   const isJoined = joined === "true";
   const [isRequested, setIsRequested] = useState(alreadyRequested === "true");
@@ -27,8 +28,6 @@ export default function ClanDetails() {
   const [activeTab, setActiveTab] = useState<"posts" | "requests" | "members">( 
     "posts"
   );
-
-  const { data: clan, isLoading } = useClanById(id!);
 
   const handleJoinRequest = (clanId: string) => {
     requestJoinClan.mutate(clanId, {

@@ -2,8 +2,7 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity, FlatList, Alert } from "react-native";
 import { getImageUrl } from "@/lib/supabase";
 import { useRouter } from "expo-router";
-import { useCancelJoinRequest, useRequestJoinClan } from "@/hooks/clanHooks";
-
+import { useCancelJoinRequest, useRequestJoinClan } from "@/api/clan";
 
 
 export default function ShowClans({ data, myRequests, joined }: { data: any[]; myRequests: any[]; joined: boolean }) {
@@ -36,56 +35,82 @@ export default function ShowClans({ data, myRequests, joined }: { data: any[]; m
             )
         ):(
         <FlatList
+            className="w-full"
             data={data}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => {
                 const alreadyRequested = myRequests?.includes(item.id);
 
                 return(
-                <View className=" mx-2 border border-sunagorik rounded-xl p-2 mb-3">
-                    <TouchableOpacity
-                        activeOpacity={0.6}
-                        onPress={() =>
-                          router.push({
-                            pathname: "/clan/[id]",
-                            params: { 
-                              id: item.id,
-                              joined: joined ? "true" : "false",
-                              alreadyRequested: alreadyRequested ? "true" : "false",
-                            },
-                          })
-                        }
-
-                    >
-                    <View className="flex flex-col gap-2">
-                        <View className="flex flex-row items-center gap-2">
-                            <Image
-                                source={{ uri: getImageUrl("clan-logos", item.logo_url ?? null) || 'https://via.placeholder.com/100' }}
-                                className="w-16 h-16 rounded-lg "
-                                resizeMode="cover" />
-                            <Text className="font-bold text-2xl">{item.name}</Text>
-                        </View> 
-                        {!!item.description && <Text className="text-gray-600 text-lg">{item.description}</Text>}
-                    </View> 
-                    </TouchableOpacity>
-                    {!joined && (
+                    <View className="mx-2 border border-sunagorik rounded-xl p-2 mb-3">
                         <TouchableOpacity
-                            onPress={() => {
-                                if(alreadyRequested) handleCancelRequest(item.id);
-                                else handleJoinRequest(item.id)
-                            }}
-                            className={`mt-2 px-4 py-2 rounded-lg items-center ${
-                                alreadyRequested ? "bg-sunagorik" : requestJoinClan.isLoading ? "bg-gray-400" : "bg-green-700"
-                            }`}
-                            disabled={requestJoinClan.isLoading}
+                            activeOpacity={0.6}
+                            onPress={() =>
+                            router.push({
+                                pathname: "/(root)/(tabs)/clan/[id]",
+                                params: { 
+                                id: item.id,
+                                joined: joined ? "true" : "false",
+                                alreadyRequested: alreadyRequested ? "true" : "false",
+                                },
+                            })
+                            }
                         >
-                            <Text className="text-white font-medium">
-                                {alreadyRequested ? "Cancel Request" : requestJoinClan.isLoading ? "Sending..." : "Send Join Request"}
+                            {/* ✅ Flex row: left (logo + name), right (members count) */}
+                            <View className="w-full flex-row items-center justify-between">
+                            {/* Left side */}
+                            <View className="flex-row items-center gap-2">
+                                <Image
+                                source={{ uri: getImageUrl("clan-logos", item.logo_url ?? null) || 'https://via.placeholder.com/100' }}
+                                className="w-16 h-16 rounded-full"
+                                resizeMode="cover" 
+                                />
+                                <Text className="font-bold text-2xl">{item.name}</Text>
+                            </View>
+
+                            {/* Right side */}
+                            <Text className="text-xl text-gray-600">
+                                {item.total_members}/{process.env.EXPO_PUBLIC_MAX_CLAN_MEMBERS}
                             </Text>
+                            </View>
                         </TouchableOpacity>
-                    )}
-                </View>
-            )}}
+
+                        {!joined && (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    if (alreadyRequested) handleCancelRequest(item.id);
+                                    else handleJoinRequest(item.id);
+                                }}
+                                className={`mt-2 px-4 py-2 rounded-lg items-center ${
+                                    item.total_members >= Number(process.env.EXPO_PUBLIC_MAX_CLAN_MEMBERS)
+                                    ? "bg-gray-400"
+                                    : alreadyRequested
+                                    ? "bg-sunagorik"
+                                    : requestJoinClan.isLoading
+                                    ? "bg-gray-400"
+                                    : "bg-green-700"
+                                }`}
+                                disabled={
+                                    requestJoinClan.isLoading ||
+                                    item.total_members >= Number(process.env.EXPO_PUBLIC_MAX_CLAN_MEMBERS)
+                                }
+                            >
+                                <Text className="text-white font-medium">
+                                    {item.total_members >= Number(process.env.EXPO_PUBLIC_MAX_CLAN_MEMBERS)
+                                        ? "Clan Full"
+                                        : alreadyRequested
+                                        ? "Cancel Request"
+                                        : requestJoinClan.isLoading
+                                        ? "Sending..."
+                                        : "Send Join Request"
+                                    }
+                                </Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+
+                )
+            }}
         />
       )
     );

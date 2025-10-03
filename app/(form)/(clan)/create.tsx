@@ -14,9 +14,10 @@ import * as FileSystem from "expo-file-system";
 import { supabase } from "@/lib/supabase";
 import { decode } from "base64-arraybuffer";
 import * as ImagePicker from "expo-image-picker";
-import { useCreateClan } from "@/hooks/clanHooks";
 import { Ionicons } from "@expo/vector-icons";
-
+import { useCreateClan } from "@/api/clan";
+import { getImageTypeFromBase64 } from "@/lib/utils";
+ 
 
 
 export default function Create() {
@@ -44,12 +45,6 @@ export default function Create() {
     name: formData.name || "",
     description: formData.description || "",
     logo_url: formData.logo_url || null,
-  };
-
-  const getImageTypeFromBase64 = (base64String: string) => {
-    if (base64String.startsWith("/9j/")) return "jpg";
-    if (base64String.startsWith("iVBORw0KGgo")) return "png";
-    return "jpg";
   };
 
   const uploadImage = async () => {
@@ -116,7 +111,7 @@ export default function Create() {
         console.log("Creating Clan with:", createData);
         const data = await createClan(createData);
         setIsSubmitting(false);
-        console.log("Clan created successfully:", data);
+        console.log("Clan created successfully:", data); 
         Alert.alert(
           t('Clan Created Successfully!'),
           t('Your clan has been created successfully.'),

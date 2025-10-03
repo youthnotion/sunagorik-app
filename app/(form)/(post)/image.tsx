@@ -15,10 +15,11 @@ import { useCreatePost } from "@/api/post/index";
 import { useAuth } from "@/providers/AuthProvider";
 import ActivityIndicator from "@/components/ActivityIndicator";
 import { useTranslation } from 'react-i18next';
+import { getImageTypeFromBase64 } from "@/lib/utils";
 
 export default function ImageUpload() {
   const { t } = useTranslation();
-  const { profile } = useAuth();
+  const { profile } = useAuth(); 
   const { formData, updateFormData } = useFormContext();
   const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
@@ -56,12 +57,6 @@ export default function ImageUpload() {
 
     requestLocation();
   }, []);
-
-  const getImageTypeFromBase64 = (base64String: string) => {
-    if (base64String.startsWith("/9j/")) return "jpg";
-    if (base64String.startsWith("iVBORw0KGgo")) return "png";
-    return "jpg";
-  };
 
   const uploadImage = async () => {
     try {

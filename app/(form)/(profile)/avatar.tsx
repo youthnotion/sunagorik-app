@@ -12,19 +12,14 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/providers/AuthProvider";
 import { decode } from "base64-arraybuffer";
 import { Alert } from "react-native";
+import { getImageTypeFromBase64 } from "@/lib/utils";
 
 export default function ImageUpload() {
-  const router = useRouter();
+  const router = useRouter(); 
   const { profile, refreshProfile } = useAuth();
   const { mutate: updateAvatar } = useUpdateAvatar();
   const [image, setImage] = useState<string | null>(null);
 
-  const getImageTypeFromBase64 = (base64String: string) => {
-    // Check the base64 header to determine file type
-    if (base64String.startsWith('/9j/')) return 'jpg';
-    if (base64String.startsWith('iVBORw0KGgo')) return 'png';
-    return 'jpg'; // default fallback
-  };
 
   const uploadImage = async () => {
     try {

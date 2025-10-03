@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, FlatList, Alert } from "react-native";
-import { useJoinRequests, useManageJoinRequest } from "@/hooks/clanHooks";
 import { getImageUrl } from "@/lib/supabase";
+import { useJoinRequests, useManageJoinRequest } from "@/api/clan";
 
 interface Props {
   clanId: string;

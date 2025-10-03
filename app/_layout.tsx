@@ -48,7 +48,7 @@ export default function RootLayout() {
             <Stack.Screen name="(root)" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(form)" options={{ headerShown: false }} />
-            <Stack.Screen name="clan"   options={{ headerShown: false }} />
+            {/* <Stack.Screen name="clan"   options={{ headerShown: false }} /> */}
             <Stack.Screen name="+not-found" />
           </Stack>
           <OfflineNotice />

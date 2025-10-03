@@ -8,9 +8,9 @@ export default function FeedLayout() {
         options={{
           title: 'Feed',
           headerShown: false,
-        }}
+        }} 
       />
-      <Stack.Screen
+      <Stack.Screen 
         name="[id]"
         options={{
           title: 'Report Details',

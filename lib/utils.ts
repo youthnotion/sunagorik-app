@@ -42,3 +42,9 @@ export function formatDate(dateString: string, locale: string = 'en'): string {
     
     return `${day} ${month}, ${year}`;
 }
+
+export function getImageTypeFromBase64(base64String: string): string {
+    if (base64String.startsWith("/9j/")) return "jpg";
+    if (base64String.startsWith("iVBORw0KGgo")) return "png";
+    return "jpg";
+};

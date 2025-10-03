@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, TouchableOpacity, FlatList, Alert } from "react-native";
-import { getUserIdOrThrow, useClanMembers, useRemoveMember, useUpdateMemberRole } from "@/hooks/clanHooks";
 import { getImageUrl } from "@/lib/supabase";
+import { useClanMembers, useRemoveMember, useUpdateMemberRole } from "@/api/clan";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface Props {
   clanId: string;
@@ -11,15 +12,9 @@ interface Props {
 export default function ClanMembersTab({ clanId, isAdmin }: Props) {
   const { data: members, isLoading } = useClanMembers(clanId);
   const removeMember = useRemoveMember(clanId);
-  const updateRole = useUpdateMemberRole(clanId); 
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const uid = await getUserIdOrThrow();
-      setCurrentUserId(uid);
-    })();
-  }, []);
+  const updateRole = useUpdateMemberRole(clanId);
+  const { session } = useAuth();
+  const currentUserId = session?.user?.id ?? null;
 
   
 
@@ -76,10 +71,10 @@ export default function ClanMembersTab({ clanId, isAdmin }: Props) {
                 <Text className="text-md text-center font-medium">{item.role === "admin" ? "Demote" : "Promote"}</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="w-[80px] px-3 py-1 bg-sunagorik rounded"
+                className={`w-[80px] px-3 py-1 bg-sunagorik rounded ${isAdmin || isSelf ? "" : "hidden"}`}
                 onPress={() => handleRemove(item.user.id, isSelf)}
               >
-                <Text className={`text-white text-md text-center font-medium ${isAdmin || isSelf ? "": "hidden"}`}>{isSelf ? "Leave" : "Remove"}</Text>
+                <Text className={`text-white text-md text-center font-medium`}>{isSelf ? "Leave" : "Remove"}</Text>
               </TouchableOpacity>
             </View>
           </View>

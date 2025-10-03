@@ -19,7 +19,7 @@ const Profile = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [timestamp, setTimestamp] = useState(Date.now());
   const [showLanguageSwitcher, setShowLanguageSwitcher] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useTranslation(); 
 
   const onRefresh = async () => {
     setRefreshing(true);
